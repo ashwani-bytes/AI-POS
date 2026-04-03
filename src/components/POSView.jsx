@@ -53,6 +53,28 @@ const POSView = () => {
   const getTotals = (cartData = cart) => calculateTotalsManual(cartData, discount, taxRate)
 
   // --- HOISTED LOGIC FUNCTIONS ---
+  async function fetchGeneralSettings() {
+    try {
+      const res = await api.get('/api/settings')
+      if (res.ok) {
+        setGeneralSettings(await res.json())
+      }
+    } catch (error) {
+      console.error('Failed to fetch general settings', error)
+    }
+  }
+
+  async function fetchProducts() {
+    try {
+      const response = await api.get('/api/products')
+      if (response.ok) {
+        const data = await response.json()
+        setProducts(data)
+      }
+    } catch (error) {
+      console.error('Failed to fetch products:', error)
+    }
+  }
 
   function addToCart(product) {
     const existing = cart.find(item => item.productId === product.id)
