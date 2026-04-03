@@ -8,8 +8,17 @@ async function performGeminiOcr(imagePath) {
     if (!apiKey) throw new Error("Missing GEMINI_API_KEY in .env")
 
     const genAI = new GoogleGenerativeAI(apiKey)
-    // Use gemini-1.5-flash with the stable v1 API to avoid v1beta 404 issues
-    const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" }, { apiVersion: 'v1' })
+    
+    // Log available models to help with debugging 404 errors
+    try {
+      const result = await genAI.getGenerativeModel({ model: "gemini-1.5-flash-latest" }).listModels();
+      console.log('[Gemini] Available models for this key:', result.models.map(m => m.name).join(', '));
+    } catch (e) {
+      console.warn('[Gemini] Could not list models:', e.message);
+    }
+
+    // Use gemini-1.5-flash-latest which is often more reliable than the versioned name
+    const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash-latest" })
 
     // Read image file and convert to base64 Part object
     const imageBytes = fs.readFileSync(imagePath)
