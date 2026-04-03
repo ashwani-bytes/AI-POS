@@ -41,6 +41,13 @@ const POSView = () => {
   const [generalSettings, setGeneralSettings] = useState(null)
   const [toast, setToast] = useState({ type: 'info', message: '' })
   const [mobileTab, setMobileTab] = useState('products') // 'products' or 'cart'
+  const [txnRef, setTxnRef] = useState('')
+
+  useEffect(() => {
+    if (showCheckoutModal) {
+      setTxnRef(`TXN${Date.now()}`)
+    }
+  }, [showCheckoutModal])
 
   function showToast(type, message) {
     setToast({ type, message })
@@ -470,7 +477,7 @@ const POSView = () => {
                       <div className="relative group">
                         <img 
                           src={`https://api.qrserver.com/v1/create-qr-code/?size=300x300&data=${encodeURIComponent(
-                            `upi://pay?pa=${generalSettings.upiId}&pn=${generalSettings?.storeName || 'Smart Store'}&am=${total.toFixed(2)}&cu=INR&tn=Bill%20from%20${encodeURIComponent(generalSettings?.storeName || 'Store')}&tr=TXN${Date.now()}`
+                            `upi://pay?pa=${generalSettings.upiId}&pn=${generalSettings?.storeName || 'Smart Store'}&am=${total.toFixed(2)}&cu=INR&tn=Bill%20from%20${encodeURIComponent(generalSettings?.storeName || 'Store')}&tr=${txnRef}`
                           )}`} 
                           alt="UPI QR Code"
                           className="w-[200px] h-[200px] object-cover rounded-xl shadow-lg border-2 border-blue-50 transition-transform group-hover:scale-105"
@@ -487,7 +494,7 @@ const POSView = () => {
                     <div className="mt-5 px-6 py-3 bg-blue-50 text-blue-700 rounded-2xl font-black text-2xl tracking-tight border border-blue-100 shadow-inner">
                        ₹ {total.toFixed(2)}
                     </div>
-                    <p className="text-[10px] text-gray-400 mt-2 font-mono uppercase">Ref: TXN{Date.now()}</p>
+                    <p className="text-[10px] text-gray-400 mt-2 font-mono uppercase tracking-widest">Reference: {txnRef}</p>
                   </div>
                 )}
                 {paymentMethod === 'cash' && (
