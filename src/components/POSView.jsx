@@ -5,6 +5,15 @@ import LoadingBar from './LoadingBar'
 import Toast from './Toast'
 import { api } from '../lib/api'
 
+// --- PURE CALCULATION UTILITY ---
+function calculateTotalsManual(cartData, discount, taxRate) {
+  const s = cartData.reduce((sum, item) => sum + (item.price * item.quantity), 0)
+  const d = discount || 0
+  const tx = Math.max(0, s - d) * taxRate
+  const tt = Math.max(0, s - d) + tx
+  return { subtotal: s, discountAmt: d, tax: tx, total: tt }
+}
+
 const POSView = () => {
   const { t } = useTheme()
   const [cart, setCart] = useState(() => {
@@ -40,14 +49,8 @@ const POSView = () => {
     }, 30000)
   }
 
-  // --- CRITICAL CALCULATION LOGIC ---
-  function calculateTotals(cartData = cart) {
-    const s = cartData.reduce((sum, item) => sum + (item.price * item.quantity), 0)
-    const d = discount || 0
-    const tx = Math.max(0, s - d) * taxRate
-    const tt = Math.max(0, s - d) + tx
-    return { subtotal: s, discountAmt: d, tax: tx, total: tt }
-  }
+  // Wrapper for convenient use
+  const getTotals = (cartData = cart) => calculateTotalsManual(cartData, discount, taxRate)
 
   // --- HOISTED LOGIC FUNCTIONS ---
 
@@ -132,7 +135,7 @@ const POSView = () => {
   }
 
   async function finalizeTransaction() {
-    const { total, discountAmt } = calculateTotals()
+    const { total, discountAmt } = getTotals()
     setCheckingOut(true)
     try {
       const response = await api.post('/api/transactions', {
@@ -167,7 +170,7 @@ const POSView = () => {
     fetchGeneralSettings()
   }, [])
 
-  const { subtotal, discountAmt, tax, total } = calculateTotals()
+  const { subtotal, discountAmt, tax, total } = getTotals()
 
   return (
     <>
