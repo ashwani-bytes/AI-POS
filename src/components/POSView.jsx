@@ -467,19 +467,27 @@ const POSView = () => {
                     <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-blue-400 to-indigo-500"></div>
                     <p className="text-xs font-bold text-gray-400 uppercase tracking-widest mb-3">Scan to Pay Exact Amount</p>
                     {generalSettings?.upiId ? (
-                      <img 
-                        src={`https://api.qrserver.com/v1/create-qr-code/?size=250x250&data=upi://pay?pa=${generalSettings.upiId}&pn=${encodeURIComponent(generalSettings?.storeName || 'Smart Store')}&am=${total.toFixed(2)}&cu=INR`} 
-                        alt="UPI QR Code"
-                        className="w-[180px] h-[180px] object-cover rounded-lg shadow-sm border border-gray-100"
-                      />
+                      <div className="relative group">
+                        <img 
+                          src={`https://api.qrserver.com/v1/create-qr-code/?size=300x300&data=${encodeURIComponent(
+                            `upi://pay?pa=${generalSettings.upiId}&pn=${generalSettings?.storeName || 'Smart Store'}&am=${total.toFixed(2)}&cu=INR&tn=Bill%20from%20${encodeURIComponent(generalSettings?.storeName || 'Store')}&tr=TXN${Date.now()}`
+                          )}`} 
+                          alt="UPI QR Code"
+                          className="w-[200px] h-[200px] object-cover rounded-xl shadow-lg border-2 border-blue-50 transition-transform group-hover:scale-105"
+                        />
+                        <div className="absolute -bottom-2 -right-2 bg-blue-600 text-white p-1 rounded-lg shadow-md">
+                          <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
+                        </div>
+                      </div>
                     ) : (
                       <div className="w-[180px] h-[180px] bg-gray-100 border-2 border-dashed border-gray-300 rounded-lg flex items-center justify-center p-4 text-center">
                         <span className="text-sm text-gray-400 font-semibold">Please add your Merchant UPI ID in Settings to generate QR code.</span>
                       </div>
                     )}
-                    <div className="mt-4 px-4 py-2 bg-blue-50 text-blue-800 rounded-full font-bold text-xl tracking-tight">
+                    <div className="mt-5 px-6 py-3 bg-blue-50 text-blue-700 rounded-2xl font-black text-2xl tracking-tight border border-blue-100 shadow-inner">
                        ₹ {total.toFixed(2)}
                     </div>
+                    <p className="text-[10px] text-gray-400 mt-2 font-mono uppercase">Ref: TXN{Date.now()}</p>
                   </div>
                 )}
                 {paymentMethod === 'cash' && (
