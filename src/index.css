@@ -1,0 +1,26 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+html, body, #root { height: 100%; }
+
+/* Strict hardware definitions specifically for USB internal 80mm generic thermal printers */
+@media print {
+  body * {
+    visibility: hidden;
+  }
+  #receipt-visualizer, #receipt-visualizer * {
+    visibility: visible;
+  }
+  #receipt-visualizer {
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 300px; /* 80mm paper logic map */
+    margin: 0;
+    padding: 0;
+    box-shadow: none !important;
+    border: none !important;
+    background: white !important;
+  }
+}

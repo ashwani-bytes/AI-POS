@@ -1,0 +1,1242 @@
+{
+  "products": [
+    {
+      "id": "3b02499f-5caa-4702-8173-443b9d5c92bd",
+      "name": "Test Item",
+      "cost": 5,
+      "price": 10,
+      "quantity": 3,
+      "category": "Test",
+      "createdAt": "2025-11-06T19:45:07.355Z",
+      "updatedAt": "2025-11-06T19:45:07.355Z",
+      "ownerUid": null
+    },
+    {
+      "id": "1b77a747-750e-447f-82fc-d66f26d7dab6",
+      "name": "Amul Milk",
+      "cost": 25,
+      "price": 40,
+      "quantity": 48,
+      "category": "Dairy",
+      "createdAt": "2026-03-28T14:31:42.410Z",
+      "updatedAt": "2026-03-28T15:01:43.857Z",
+      "ownerUid": "dev"
+    },
+    {
+      "id": "4ce04d11-a890-4b15-b3f7-259beeaf1c16",
+      "name": "Lays Chips",
+      "cost": 10,
+      "price": 20,
+      "quantity": 97,
+      "category": "Snacks",
+      "createdAt": "2026-03-28T14:32:09.744Z",
+      "updatedAt": "2026-03-28T15:01:43.854Z",
+      "ownerUid": "dev"
+    },
+    {
+      "id": "701db0cf-aad7-466e-8af7-6b57aa303d79",
+      "name": "GsTin CASH/CREDITBILL",
+      "cost": null,
+      "price": null,
+      "quantity": 0,
+      "category": "Other",
+      "createdAt": "2026-03-28T14:49:42.569Z",
+      "updatedAt": "2026-03-28T15:01:43.850Z",
+      "ownerUid": "dev"
+    },
+    {
+      "id": "c86ee691-041f-44cc-acbb-92543ec1b108",
+      "name": ":",
+      "cost": 26,
+      "price": 37,
+      "quantity": 1,
+      "category": "Other",
+      "createdAt": "2026-03-28T14:49:42.581Z",
+      "updatedAt": "2026-03-28T14:49:42.581Z",
+      "ownerUid": "dev"
+    },
+    {
+      "id": "b32dc712-6a36-40bd-9803-cf4a97fc31c5",
+      "name": "Composite Deer \"07H ZM Coll: 81423",
+      "cost": 54236,
+      "price": 77480,
+      "quantity": 0,
+      "category": "Other",
+      "createdAt": "2026-03-28T14:49:42.588Z",
+      "updatedAt": "2026-03-28T15:01:43.839Z",
+      "ownerUid": "dev"
+    },
+    {
+      "id": "62bcd3a8-aacf-4643-a5b7-d12aed1f9db8",
+      "name": "99662",
+      "cost": 31966,
+      "price": 45666,
+      "quantity": 0,
+      "category": "Other",
+      "createdAt": "2026-03-28T14:49:42.594Z",
+      "updatedAt": "2026-03-28T15:01:43.843Z",
+      "ownerUid": "dev"
+    },
+    {
+      "id": "80497087-d55d-4f88-909a-9083717993fb",
+      "name": "y SRI VYSHNAVI",
+      "cost": 3,
+      "price": 4,
+      "quantity": 0,
+      "category": "Other",
+      "createdAt": "2026-03-28T14:49:42.599Z",
+      "updatedAt": "2026-03-28T15:01:43.847Z",
+      "ownerUid": "dev"
+    },
+    {
+      "id": "70f53b09-4184-4f94-bb9f-5d3ea26a0311",
+      "name": "& BOOKS / PENS / STATIONERY",
+      "cost": 528,
+      "price": 754,
+      "quantity": 1,
+      "category": "Stationery",
+      "createdAt": "2026-03-28T14:49:42.608Z",
+      "updatedAt": "2026-03-28T14:49:42.608Z",
+      "ownerUid": "dev"
+    },
+    {
+      "id": "bdabd370-36d3-42ec-a639-89e5c34824b3",
+      "name": "#40519117A, Near PB. Sidharth Arts College,",
+      "cost": null,
+      "price": null,
+      "quantity": 0,
+      "category": "Other",
+      "createdAt": "2026-03-28T14:49:42.614Z",
+      "updatedAt": "2026-03-28T15:01:43.835Z",
+      "ownerUid": "dev"
+    },
+    {
+      "id": "9d5d8275-23c1-4da0-9dfe-e27bfe209d98",
+      "name": "Moghairajpuram, Vijayawada  520",
+      "cost": 7,
+      "price": 10,
+      "quantity": 0,
+      "category": "Other",
+      "createdAt": "2026-03-28T14:49:42.618Z",
+      "updatedAt": "2026-03-28T15:01:43.833Z",
+      "ownerUid": "dev"
+    },
+    {
+      "id": "6d602275-8e08-4ceb-929c-0ee8342b23ec",
+      "name": "ss: Date OSA.",
+      "cost": null,
+      "price": null,
+      "quantity": 0,
+      "category": "Other",
+      "createdAt": "2026-03-28T14:49:42.626Z",
+      "updatedAt": "2026-03-28T15:01:43.830Z",
+      "ownerUid": "dev"
+    },
+    {
+      "id": "6de5dbf8-f317-4557-9f64-768559e47cda",
+      "name": "or] owes ay ove] prom |",
+      "cost": null,
+      "price": null,
+      "quantity": 0,
+      "category": "Other",
+      "createdAt": "2026-03-28T14:49:42.631Z",
+      "updatedAt": "2026-03-28T15:01:43.827Z",
+      "ownerUid": "dev"
+    },
+    {
+      "id": "6a1b5e27-dc7e-447b-9926-34d085883b18",
+      "name": "O [Arde mat rgpom uv n Suv",
+      "cost": null,
+      "price": null,
+      "quantity": 1,
+      "category": "Other",
+      "createdAt": "2026-03-28T14:49:42.636Z",
+      "updatedAt": "2026-03-28T14:49:42.636Z",
+      "ownerUid": "dev"
+    },
+    {
+      "id": "e57b43d5-078c-46aa-bb9e-57ab87136538",
+      "name": "[co ) SC Rl Nd",
+      "cost": null,
+      "price": null,
+      "quantity": 1,
+      "category": "Other",
+      "createdAt": "2026-03-28T14:49:42.642Z",
+      "updatedAt": "2026-03-28T14:49:42.642Z",
+      "ownerUid": "dev"
+    },
+    {
+      "id": "7d00efdf-b798-4543-a511-c0c65ce207ac",
+      "name": "© [seston ao > ===",
+      "cost": null,
+      "price": null,
+      "quantity": 1,
+      "category": "Other",
+      "createdAt": "2026-03-28T14:49:42.647Z",
+      "updatedAt": "2026-03-28T14:49:42.647Z",
+      "ownerUid": "dev"
+    },
+    {
+      "id": "3d5f2860-46b9-4e96-9a62-1daef9b2384a",
+      "name": "IG) ~ LEN PE IRC",
+      "cost": null,
+      "price": null,
+      "quantity": 0,
+      "category": "Other",
+      "createdAt": "2026-03-28T14:49:42.654Z",
+      "updatedAt": "2026-03-28T15:01:43.825Z",
+      "ownerUid": "dev"
+    },
+    {
+      "id": "8bc7ca24-c6d4-49b0-84ad-c2e9e5d74a70",
+      "name": "(Ay idan Bonde we vee see",
+      "cost": null,
+      "price": null,
+      "quantity": 1,
+      "category": "Other",
+      "createdAt": "2026-03-28T14:49:42.659Z",
+      "updatedAt": "2026-03-28T14:49:42.659Z",
+      "ownerUid": "dev"
+    },
+    {
+      "id": "118f40e8-8333-42fc-be7a-0170555718da",
+      "name": "® [coe un wer [3s Fuss",
+      "cost": null,
+      "price": null,
+      "quantity": 0,
+      "category": "Other",
+      "createdAt": "2026-03-28T14:49:42.664Z",
+      "updatedAt": "2026-03-28T15:01:43.821Z",
+      "ownerUid": "dev"
+    },
+    {
+      "id": "79d6c52c-d5cc-4883-af53-8af94b8633bf",
+      "name": "© [2X caren AN we",
+      "cost": null,
+      "price": null,
+      "quantity": 0,
+      "category": "Other",
+      "createdAt": "2026-03-28T14:49:42.670Z",
+      "updatedAt": "2026-03-28T15:01:43.818Z",
+      "ownerUid": "dev"
+    },
+    {
+      "id": "7120615f-b8ce-4550-b4f0-8b3c33039eb8",
+      "name": "® iy sax fron | nee",
+      "cost": null,
+      "price": null,
+      "quantity": 0,
+      "category": "Other",
+      "createdAt": "2026-03-28T14:49:42.675Z",
+      "updatedAt": "2026-03-28T15:01:43.813Z",
+      "ownerUid": "dev"
+    },
+    {
+      "id": "8a30fbdd-b854-40de-bbd3-8786a589ed32",
+      "name": "og veo biog",
+      "cost": 1,
+      "price": 1,
+      "quantity": 0,
+      "category": "Other",
+      "createdAt": "2026-03-28T14:49:42.679Z",
+      "updatedAt": "2026-03-28T15:01:43.809Z",
+      "ownerUid": "dev"
+    },
+    {
+      "id": "d408273c-9b29-497b-9d79-9fecdcf40421",
+      "name": "@ [Bodh Pemer \\en fF [120 Sages",
+      "cost": null,
+      "price": null,
+      "quantity": 0,
+      "category": "Other",
+      "createdAt": "2026-03-28T14:49:42.684Z",
+      "updatedAt": "2026-03-28T15:01:43.805Z",
+      "ownerUid": "dev"
+    },
+    {
+      "id": "d66b5aad-b2f4-44fe-be50-df667fdb7ca4",
+      "name": "DO [ Pei Suns Nol pc Ei",
+      "cost": null,
+      "price": null,
+      "quantity": 0,
+      "category": "Other",
+      "createdAt": "2026-03-28T14:49:42.690Z",
+      "updatedAt": "2026-03-28T15:01:43.799Z",
+      "ownerUid": "dev"
+    },
+    {
+      "id": "3932797c-7d6f-4010-be4b-981309f0ca59",
+      "name": "2 aps Nou Ney | do Bi",
+      "cost": null,
+      "price": null,
+      "quantity": 0,
+      "category": "Other",
+      "createdAt": "2026-03-28T14:49:42.695Z",
+      "updatedAt": "2026-03-28T15:01:43.782Z",
+      "ownerUid": "dev"
+    },
+    {
+      "id": "fbc74a67-fd16-4c86-b4cf-bf48b9c458fd",
+      "name": "& ot Ses",
+      "cost": 178,
+      "price": 254,
+      "quantity": 0,
+      "category": "Other",
+      "createdAt": "2026-03-28T14:49:42.700Z",
+      "updatedAt": "2026-03-28T15:01:43.791Z",
+      "ownerUid": "dev"
+    },
+    {
+      "id": "7d205181-8687-499c-a745-7151a560d3f8",
+      "name": "Jo Mame eels zou] go",
+      "cost": null,
+      "price": null,
+      "quantity": 0,
+      "category": "Other",
+      "createdAt": "2026-03-28T14:49:42.703Z",
+      "updatedAt": "2026-03-28T15:01:43.774Z",
+      "ownerUid": "dev"
+    },
+    {
+      "id": "392716e7-9aae-4e1f-8b8e-dd4542e79714",
+      "name": "i",
+      "cost": null,
+      "price": null,
+      "quantity": 0,
+      "category": "Other",
+      "createdAt": "2026-03-28T14:49:42.708Z",
+      "updatedAt": "2026-03-28T15:01:43.795Z",
+      "ownerUid": "dev"
+    },
+    {
+      "id": "a7d2d008-130c-491e-83ef-a5c3cde213db",
+      "name": "Ts",
+      "cost": null,
+      "price": null,
+      "quantity": 0,
+      "category": "Other",
+      "createdAt": "2026-03-28T14:49:42.716Z",
+      "updatedAt": "2026-03-28T15:01:43.779Z",
+      "ownerUid": "dev"
+    },
+    {
+      "id": "3bd343a1-482e-4bc0-a371-cd8a7354cee0",
+      "name": "ENS  ¥ oT",
+      "cost": null,
+      "price": null,
+      "quantity": 0,
+      "category": "Other",
+      "createdAt": "2026-03-28T14:49:42.721Z",
+      "updatedAt": "2026-03-28T15:01:43.764Z",
+      "ownerUid": "dev"
+    },
+    {
+      "id": "cef21799-9b2d-482f-add8-269ef5b3fea9",
+      "name": "Authorisid Signatory",
+      "cost": null,
+      "price": null,
+      "quantity": 0,
+      "category": "Other",
+      "createdAt": "2026-03-28T14:49:42.726Z",
+      "updatedAt": "2026-03-28T15:01:43.771Z",
+      "ownerUid": "dev"
+    },
+    {
+      "id": "1c80c3e9-650f-4a7b-886d-f720eecb41a5",
+      "name": "__",
+      "cost": null,
+      "price": null,
+      "quantity": 1,
+      "category": "Other",
+      "createdAt": "2026-03-28T14:49:42.731Z",
+      "updatedAt": "2026-03-28T14:49:42.731Z",
+      "ownerUid": "dev"
+    },
+    {
+      "id": "f274c564-fb88-414f-a19b-35361ffc1fe3",
+      "name": "KACHA BILL",
+      "cost": null,
+      "price": null,
+      "quantity": 1,
+      "category": "Other",
+      "createdAt": "2026-03-28T15:03:21.918Z",
+      "updatedAt": "2026-03-28T15:03:21.918Z",
+      "ownerUid": "dev"
+    },
+    {
+      "id": "fdce2797-507f-4139-9c98-829645d7969d",
+      "name": "RouGH STOCK ESTIMATE",
+      "cost": null,
+      "price": null,
+      "quantity": 1,
+      "category": "Other",
+      "createdAt": "2026-03-28T15:03:21.929Z",
+      "updatedAt": "2026-03-28T15:03:21.929Z",
+      "ownerUid": "dev"
+    },
+    {
+      "id": "228d34f3-a0f3-44ad-b728-fa84666d0a46",
+      "name": "© Date: 28/03/2026 Ref. No: K",
+      "cost": 729,
+      "price": 1042,
+      "quantity": 1,
+      "category": "Other",
+      "createdAt": "2026-03-28T15:03:21.942Z",
+      "updatedAt": "2026-03-28T15:03:21.942Z",
+      "ownerUid": "dev"
+    },
+    {
+      "id": "11d0a44e-54ba-4019-b6f6-c01c344ae98e",
+      "name": "SN. a TaEEATTIOCT TorAL",
+      "cost": null,
+      "price": null,
+      "quantity": 1,
+      "category": "Other",
+      "createdAt": "2026-03-28T15:03:21.947Z",
+      "updatedAt": "2026-03-28T15:03:21.947Z",
+      "ownerUid": "dev"
+    },
+    {
+      "id": "c195ee28-4aee-4d39-b69c-924647f166e3",
+      "name": "I. | Lays (Classic Salted) 20 50",
+      "cost": 700,
+      "price": 1000,
+      "quantity": 1,
+      "category": "Snacks",
+      "createdAt": "2026-03-28T15:03:21.954Z",
+      "updatedAt": "2026-03-28T15:03:21.954Z",
+      "ownerUid": "dev"
+    },
+    {
+      "id": "15586e85-0491-4d5b-a75d-3e1e5c5b0ce8",
+      "name": "2. | Maaza (600ml) 40 24",
+      "cost": 672,
+      "price": 960,
+      "quantity": 1,
+      "category": "Other",
+      "createdAt": "2026-03-28T15:03:21.959Z",
+      "updatedAt": "2026-03-28T15:03:21.959Z",
+      "ownerUid": "dev"
+    },
+    {
+      "id": "9d9f2dad-17e0-4e1f-a3c6-7f3ea32a11c2",
+      "name": "2. | Britannia Biscuits 10 100",
+      "cost": 700,
+      "price": 1000,
+      "quantity": 1,
+      "category": "Snacks",
+      "createdAt": "2026-03-28T15:03:21.964Z",
+      "updatedAt": "2026-03-28T15:03:21.964Z",
+      "ownerUid": "dev"
+    },
+    {
+      "id": "f25b2e61-073d-441c-af38-4c1ef4f4f4e0",
+      "name": "4. | Kurkure (Masala Munch)| 20 60",
+      "cost": 840,
+      "price": 1200,
+      "quantity": 1,
+      "category": "Snacks",
+      "createdAt": "2026-03-28T15:03:21.970Z",
+      "updatedAt": "2026-03-28T15:03:21.970Z",
+      "ownerUid": "dev"
+    },
+    {
+      "id": "16535ec8-2cdd-48bc-810c-1f3737f567f6",
+      "name": "5: Dairy Milk | | 10 40 400 g",
+      "cost": null,
+      "price": null,
+      "quantity": 1,
+      "category": "Dairy",
+      "createdAt": "2026-03-28T15:03:21.976Z",
+      "updatedAt": "2026-03-28T15:03:21.976Z",
+      "ownerUid": "dev"
+    },
+    {
+      "id": "e6f64e2d-fb90-48b9-81cf-24e8ea34531b",
+      "name": "‘6. Uncle Chips 20 30 600 $",
+      "cost": null,
+      "price": null,
+      "quantity": 1,
+      "category": "Snacks",
+      "createdAt": "2026-03-28T15:03:21.982Z",
+      "updatedAt": "2026-03-28T15:03:21.982Z",
+      "ownerUid": "dev"
+    },
+    {
+      "id": "3fad061a-acb2-49c1-b9b6-f721db272fec",
+      "name": "7. | Hide & Seek Biscuits 30 20 600 |",
+      "cost": null,
+      "price": null,
+      "quantity": 1,
+      "category": "Snacks",
+      "createdAt": "2026-03-28T15:03:21.988Z",
+      "updatedAt": "2026-03-28T15:03:21.988Z",
+      "ownerUid": "dev"
+    },
+    {
+      "id": "f5540e08-bcda-46c7-a753-d29c4d040208",
+      "name": "= le ToTAL STOCK VALUE: Z 5,160 \\",
+      "cost": null,
+      "price": null,
+      "quantity": 1,
+      "category": "Other",
+      "createdAt": "2026-03-28T15:03:21.996Z",
+      "updatedAt": "2026-03-28T15:03:21.996Z",
+      "ownerUid": "dev"
+    },
+    {
+      "id": "f7f86930-8c82-4720-89a4-9336cab80fbb",
+      "name": "Notes: ~ Check expiry for Maaza [Biscuits next week.",
+      "cost": null,
+      "price": null,
+      "quantity": 1,
+      "category": "Snacks",
+      "createdAt": "2026-03-28T15:03:22.003Z",
+      "updatedAt": "2026-03-28T15:03:22.003Z",
+      "ownerUid": "dev"
+    },
+    {
+      "id": "45f6245c-54ef-4552-824d-5685a54e59eb",
+      "name": "Restock Kurkure if daily sales >",
+      "cost": 7,
+      "price": 10,
+      "quantity": 0,
+      "category": "Snacks",
+      "createdAt": "2026-03-28T15:03:22.008Z",
+      "updatedAt": "2026-03-28T15:06:37.353Z",
+      "ownerUid": "dev"
+    }
+  ],
+  "customers": [
+    {
+      "id": "ff0a68b8-570c-4231-85fa-4835b9551a4e",
+      "name": "abRahul Sharma",
+      "phone": "9876543210",
+      "email": "rahul@test.com",
+      "address": null,
+      "createdAt": "2026-03-28T14:33:25.883Z",
+      "updatedAt": "2026-03-28T14:33:25.883Z",
+      "ownerUid": "dev"
+    }
+  ],
+  "vendors": [],
+  "transactions": [
+    {
+      "id": "73485303-5630-46d5-b147-fbef13542697",
+      "items": [
+        {
+          "productId": "1b77a747-750e-447f-82fc-d66f26d7dab6",
+          "name": "Amul Milk",
+          "price": 40,
+          "quantity": 1
+        }
+      ],
+      "payments": [
+        {
+          "method": "cash",
+          "amount": 47.2
+        }
+      ],
+      "customerId": null,
+      "discount": 0,
+      "taxRate": 0.18,
+      "subtotal": 40,
+      "tax": 7.2,
+      "total": 47.2,
+      "createdAt": "2026-03-28T14:35:14.606Z",
+      "ownerUid": "dev",
+      "type": "sale"
+    },
+    {
+      "id": "901a35cf-1614-47be-a86f-b42a5faee36e",
+      "items": [
+        {
+          "productId": "4ce04d11-a890-4b15-b3f7-259beeaf1c16",
+          "name": "Lays Chips",
+          "price": 20,
+          "quantity": 2
+        }
+      ],
+      "payments": [
+        {
+          "method": "cash",
+          "amount": 47.2
+        }
+      ],
+      "customerId": null,
+      "discount": 0,
+      "taxRate": 0.18,
+      "subtotal": 40,
+      "tax": 7.2,
+      "total": 47.2,
+      "createdAt": "2026-03-28T14:45:04.038Z",
+      "ownerUid": "dev",
+      "type": "sale"
+    },
+    {
+      "id": "014dc05e-fcd1-41ff-8d91-eb0b20592a7d",
+      "items": [
+        {
+          "productId": "3bd343a1-482e-4bc0-a371-cd8a7354cee0",
+          "name": "ENS  ¥ oT",
+          "price": 0,
+          "quantity": 2
+        },
+        {
+          "productId": "cef21799-9b2d-482f-add8-269ef5b3fea9",
+          "name": "Authorisid Signatory",
+          "price": 0,
+          "quantity": 1
+        },
+        {
+          "productId": "7d205181-8687-499c-a745-7151a560d3f8",
+          "name": "Jo Mame eels zou] go",
+          "price": 0,
+          "quantity": 1
+        },
+        {
+          "productId": "a7d2d008-130c-491e-83ef-a5c3cde213db",
+          "name": "Ts",
+          "price": 0,
+          "quantity": 1
+        },
+        {
+          "productId": "3932797c-7d6f-4010-be4b-981309f0ca59",
+          "name": "2 aps Nou Ney | do Bi",
+          "price": 0,
+          "quantity": 1
+        },
+        {
+          "productId": "fbc74a67-fd16-4c86-b4cf-bf48b9c458fd",
+          "name": "& ot Ses",
+          "price": 254,
+          "quantity": 1
+        },
+        {
+          "productId": "392716e7-9aae-4e1f-8b8e-dd4542e79714",
+          "name": "i",
+          "price": 0,
+          "quantity": 1
+        },
+        {
+          "productId": "d66b5aad-b2f4-44fe-be50-df667fdb7ca4",
+          "name": "DO [ Pei Suns Nol pc Ei",
+          "price": 0,
+          "quantity": 1
+        },
+        {
+          "productId": "d408273c-9b29-497b-9d79-9fecdcf40421",
+          "name": "@ [Bodh Pemer \\en fF [120 Sages",
+          "price": 0,
+          "quantity": 1
+        },
+        {
+          "productId": "8a30fbdd-b854-40de-bbd3-8786a589ed32",
+          "name": "og veo biog",
+          "price": 1,
+          "quantity": 1
+        },
+        {
+          "productId": "7120615f-b8ce-4550-b4f0-8b3c33039eb8",
+          "name": "® iy sax fron | nee",
+          "price": 0,
+          "quantity": 1
+        },
+        {
+          "productId": "79d6c52c-d5cc-4883-af53-8af94b8633bf",
+          "name": "© [2X caren AN we",
+          "price": 0,
+          "quantity": 1
+        },
+        {
+          "productId": "118f40e8-8333-42fc-be7a-0170555718da",
+          "name": "® [coe un wer [3s Fuss",
+          "price": 0,
+          "quantity": 1
+        },
+        {
+          "productId": "3d5f2860-46b9-4e96-9a62-1daef9b2384a",
+          "name": "IG) ~ LEN PE IRC",
+          "price": 0,
+          "quantity": 1
+        },
+        {
+          "productId": "6de5dbf8-f317-4557-9f64-768559e47cda",
+          "name": "or] owes ay ove] prom |",
+          "price": 0,
+          "quantity": 1
+        },
+        {
+          "productId": "6d602275-8e08-4ceb-929c-0ee8342b23ec",
+          "name": "ss: Date OSA.",
+          "price": 0,
+          "quantity": 1
+        },
+        {
+          "productId": "9d5d8275-23c1-4da0-9dfe-e27bfe209d98",
+          "name": "Moghairajpuram, Vijayawada  520",
+          "price": 10,
+          "quantity": 1
+        },
+        {
+          "productId": "bdabd370-36d3-42ec-a639-89e5c34824b3",
+          "name": "#40519117A, Near PB. Sidharth Arts College,",
+          "price": 0,
+          "quantity": 1
+        },
+        {
+          "productId": "b32dc712-6a36-40bd-9803-cf4a97fc31c5",
+          "name": "Composite Deer \"07H ZM Coll: 81423",
+          "price": 77480,
+          "quantity": 1
+        },
+        {
+          "productId": "62bcd3a8-aacf-4643-a5b7-d12aed1f9db8",
+          "name": "99662",
+          "price": 45666,
+          "quantity": 1
+        },
+        {
+          "productId": "80497087-d55d-4f88-909a-9083717993fb",
+          "name": "y SRI VYSHNAVI",
+          "price": 4,
+          "quantity": 1
+        },
+        {
+          "productId": "701db0cf-aad7-466e-8af7-6b57aa303d79",
+          "name": "GsTin CASH/CREDITBILL",
+          "price": 0,
+          "quantity": 1
+        },
+        {
+          "productId": "4ce04d11-a890-4b15-b3f7-259beeaf1c16",
+          "name": "Lays Chips",
+          "price": 20,
+          "quantity": 1
+        },
+        {
+          "productId": "1b77a747-750e-447f-82fc-d66f26d7dab6",
+          "name": "Amul Milk",
+          "price": 40,
+          "quantity": 1
+        }
+      ],
+      "payments": [
+        {
+          "method": "cash",
+          "amount": 145700.5
+        }
+      ],
+      "customerId": null,
+      "discount": 0,
+      "taxRate": 0.18,
+      "subtotal": 123475,
+      "tax": 22225.5,
+      "total": 145700.5,
+      "createdAt": "2026-03-28T15:01:43.719Z",
+      "ownerUid": "dev",
+      "type": "sale"
+    },
+    {
+      "id": "818ba386-991c-4346-91d9-957d59be5e03",
+      "items": [
+        {
+          "productId": "45f6245c-54ef-4552-824d-5685a54e59eb",
+          "name": "Restock Kurkure if daily sales >",
+          "price": 10,
+          "quantity": 1
+        }
+      ],
+      "payments": [
+        {
+          "method": "cash",
+          "amount": 11.8
+        }
+      ],
+      "customerId": null,
+      "discount": 0,
+      "taxRate": 0.18,
+      "subtotal": 10,
+      "tax": 1.8,
+      "total": 11.8,
+      "createdAt": "2026-03-28T15:06:37.317Z",
+      "ownerUid": "dev",
+      "type": "sale"
+    }
+  ],
+  "uploads": [
+    {
+      "id": "9cd592bc-370a-4469-8f7c-0980136a3c0e",
+      "ownerUid": "dev",
+      "path": "E:\\download\\Tally_OCR_based_billing_system-main\\Tally_OCR_based_billing_system-main\\server\\uploads\\1774708661596_90e1ead9-26ec-40ee-959a-dcf1badae255.webp",
+      "downloadURL": "/uploads/1774708661596_90e1ead9-26ec-40ee-959a-dcf1badae255.webp",
+      "contentType": "image/webp",
+      "size": 45864,
+      "ocrText": "GsTin CASH/CREDITBILL\n: 37\nComposite Deer \"07H ZM Coll: 81423 77480\n99662 45666\ny SRI VYSHNAVI 4\n& BOOKS / PENS / STATIONERY 754\n#40-5-19117A, Near PB. Sidharth Arts College,\nMoghairajpuram, Vijayawada - 520 010.\nss: Date OSA.\nor] owes ay ove] prom |\nO [Arde mat rgpom uv n Suv\n[co ) SC Rl Nd\n© [seston ao > ===\nIG) ~ LEN PE IRC\n(Ay idan Bonde we vee see\n® [coe un wer [3s Fuss\n© [2X caren AN we\n® iy sax fron | nee\nog veo biog 1\n@ [Bodh Pemer \\en fF [120 Sages\nDO [ Pei Suns Nol pc Ei\n2 aps Nou Ney | do Bi\n& ot Ses 254\nJo Mame eels zou] go\ni\nTs\nENS — ¥ oT\nAuthorisid Signatory\n—_—_——\n",
+      "items": [
+        {
+          "name": "GsTin CASH/CREDITBILL",
+          "quantity": 1,
+          "price": null,
+          "category": "Uncategorized"
+        },
+        {
+          "name": ":",
+          "quantity": 1,
+          "price": 37,
+          "category": "Uncategorized"
+        },
+        {
+          "name": "Composite Deer \"07H ZM Coll: 81423",
+          "quantity": 1,
+          "price": 77480,
+          "category": "Uncategorized"
+        },
+        {
+          "name": "99662",
+          "quantity": 1,
+          "price": 45666,
+          "category": "Uncategorized"
+        },
+        {
+          "name": "y SRI VYSHNAVI",
+          "quantity": 1,
+          "price": 4,
+          "category": "Uncategorized"
+        },
+        {
+          "name": "& BOOKS / PENS / STATIONERY",
+          "quantity": 1,
+          "price": 754,
+          "category": "Uncategorized"
+        },
+        {
+          "name": "#40519117A, Near PB. Sidharth Arts College,",
+          "quantity": 1,
+          "price": null,
+          "category": "Uncategorized"
+        },
+        {
+          "name": "Moghairajpuram, Vijayawada  520",
+          "quantity": 1,
+          "price": 10,
+          "category": "Uncategorized"
+        },
+        {
+          "name": "ss: Date OSA.",
+          "quantity": 1,
+          "price": null,
+          "category": "Uncategorized"
+        },
+        {
+          "name": "or] owes ay ove] prom |",
+          "quantity": 1,
+          "price": null,
+          "category": "Uncategorized"
+        },
+        {
+          "name": "O [Arde mat rgpom uv n Suv",
+          "quantity": 1,
+          "price": null,
+          "category": "Uncategorized"
+        },
+        {
+          "name": "[co ) SC Rl Nd",
+          "quantity": 1,
+          "price": null,
+          "category": "Uncategorized"
+        },
+        {
+          "name": "© [seston ao > ===",
+          "quantity": 1,
+          "price": null,
+          "category": "Uncategorized"
+        },
+        {
+          "name": "IG) ~ LEN PE IRC",
+          "quantity": 1,
+          "price": null,
+          "category": "Uncategorized"
+        },
+        {
+          "name": "(Ay idan Bonde we vee see",
+          "quantity": 1,
+          "price": null,
+          "category": "Uncategorized"
+        },
+        {
+          "name": "® [coe un wer [3s Fuss",
+          "quantity": 1,
+          "price": null,
+          "category": "Uncategorized"
+        },
+        {
+          "name": "© [2X caren AN we",
+          "quantity": 1,
+          "price": null,
+          "category": "Uncategorized"
+        },
+        {
+          "name": "® iy sax fron | nee",
+          "quantity": 1,
+          "price": null,
+          "category": "Uncategorized"
+        },
+        {
+          "name": "og veo biog",
+          "quantity": 1,
+          "price": 1,
+          "category": "Uncategorized"
+        },
+        {
+          "name": "@ [Bodh Pemer \\en fF [120 Sages",
+          "quantity": 1,
+          "price": null,
+          "category": "Uncategorized"
+        },
+        {
+          "name": "DO [ Pei Suns Nol pc Ei",
+          "quantity": 1,
+          "price": null,
+          "category": "Uncategorized"
+        },
+        {
+          "name": "2 aps Nou Ney | do Bi",
+          "quantity": 1,
+          "price": null,
+          "category": "Uncategorized"
+        },
+        {
+          "name": "& ot Ses",
+          "quantity": 1,
+          "price": 254,
+          "category": "Uncategorized"
+        },
+        {
+          "name": "Jo Mame eels zou] go",
+          "quantity": 1,
+          "price": null,
+          "category": "Uncategorized"
+        },
+        {
+          "name": "i",
+          "quantity": 1,
+          "price": null,
+          "category": "Uncategorized"
+        },
+        {
+          "name": "Ts",
+          "quantity": 1,
+          "price": null,
+          "category": "Uncategorized"
+        },
+        {
+          "name": "ENS  ¥ oT",
+          "quantity": 1,
+          "price": null,
+          "category": "Uncategorized"
+        },
+        {
+          "name": "Authorisid Signatory",
+          "quantity": 1,
+          "price": null,
+          "category": "Uncategorized"
+        },
+        {
+          "name": "__",
+          "quantity": 1,
+          "price": null,
+          "category": "Uncategorized"
+        }
+      ],
+      "createdAt": "2026-03-28T14:37:41.654Z"
+    },
+    {
+      "id": "59c4884c-5bcd-42df-a902-2220485e31ed",
+      "ownerUid": "dev",
+      "path": "E:\\download\\Tally_OCR_based_billing_system-main\\Tally_OCR_based_billing_system-main\\server\\uploads\\1774709382531_8cabe023-75d0-4ce6-a4d5-17da5bda2704.webp",
+      "downloadURL": "/uploads/1774709382531_8cabe023-75d0-4ce6-a4d5-17da5bda2704.webp",
+      "contentType": "image/webp",
+      "size": 45864,
+      "ocrText": "GsTin CASH/CREDITBILL\n: 37\nComposite Deer \"07H ZM Coll: 81423 77480\n99662 45666\ny SRI VYSHNAVI 4\n& BOOKS / PENS / STATIONERY 754\n#40-5-19117A, Near PB. Sidharth Arts College,\nMoghairajpuram, Vijayawada - 520 010.\nss: Date OSA.\nor] owes ay ove] prom |\nO [Arde mat rgpom uv n Suv\n[co ) SC Rl Nd\n© [seston ao > ===\nIG) ~ LEN PE IRC\n(Ay idan Bonde we vee see\n® [coe un wer [3s Fuss\n© [2X caren AN we\n® iy sax fron | nee\nog veo biog 1\n@ [Bodh Pemer \\en fF [120 Sages\nDO [ Pei Suns Nol pc Ei\n2 aps Nou Ney | do Bi\n& ot Ses 254\nJo Mame eels zou] go\ni\nTs\nENS — ¥ oT\nAuthorisid Signatory\n—_—_——\n",
+      "items": [
+        {
+          "name": "GsTin CASH/CREDITBILL",
+          "quantity": 1,
+          "price": null,
+          "category": "Uncategorized"
+        },
+        {
+          "name": ":",
+          "quantity": 1,
+          "price": 37,
+          "category": "Uncategorized"
+        },
+        {
+          "name": "Composite Deer \"07H ZM Coll: 81423",
+          "quantity": 1,
+          "price": 77480,
+          "category": "Uncategorized"
+        },
+        {
+          "name": "99662",
+          "quantity": 1,
+          "price": 45666,
+          "category": "Uncategorized"
+        },
+        {
+          "name": "y SRI VYSHNAVI",
+          "quantity": 1,
+          "price": 4,
+          "category": "Uncategorized"
+        },
+        {
+          "name": "& BOOKS / PENS / STATIONERY",
+          "quantity": 1,
+          "price": 754,
+          "category": "Uncategorized"
+        },
+        {
+          "name": "#40519117A, Near PB. Sidharth Arts College,",
+          "quantity": 1,
+          "price": null,
+          "category": "Uncategorized"
+        },
+        {
+          "name": "Moghairajpuram, Vijayawada  520",
+          "quantity": 1,
+          "price": 10,
+          "category": "Uncategorized"
+        },
+        {
+          "name": "ss: Date OSA.",
+          "quantity": 1,
+          "price": null,
+          "category": "Uncategorized"
+        },
+        {
+          "name": "or] owes ay ove] prom |",
+          "quantity": 1,
+          "price": null,
+          "category": "Uncategorized"
+        },
+        {
+          "name": "O [Arde mat rgpom uv n Suv",
+          "quantity": 1,
+          "price": null,
+          "category": "Uncategorized"
+        },
+        {
+          "name": "[co ) SC Rl Nd",
+          "quantity": 1,
+          "price": null,
+          "category": "Uncategorized"
+        },
+        {
+          "name": "© [seston ao > ===",
+          "quantity": 1,
+          "price": null,
+          "category": "Uncategorized"
+        },
+        {
+          "name": "IG) ~ LEN PE IRC",
+          "quantity": 1,
+          "price": null,
+          "category": "Uncategorized"
+        },
+        {
+          "name": "(Ay idan Bonde we vee see",
+          "quantity": 1,
+          "price": null,
+          "category": "Uncategorized"
+        },
+        {
+          "name": "® [coe un wer [3s Fuss",
+          "quantity": 1,
+          "price": null,
+          "category": "Uncategorized"
+        },
+        {
+          "name": "© [2X caren AN we",
+          "quantity": 1,
+          "price": null,
+          "category": "Uncategorized"
+        },
+        {
+          "name": "® iy sax fron | nee",
+          "quantity": 1,
+          "price": null,
+          "category": "Uncategorized"
+        },
+        {
+          "name": "og veo biog",
+          "quantity": 1,
+          "price": 1,
+          "category": "Uncategorized"
+        },
+        {
+          "name": "@ [Bodh Pemer \\en fF [120 Sages",
+          "quantity": 1,
+          "price": null,
+          "category": "Uncategorized"
+        },
+        {
+          "name": "DO [ Pei Suns Nol pc Ei",
+          "quantity": 1,
+          "price": null,
+          "category": "Uncategorized"
+        },
+        {
+          "name": "2 aps Nou Ney | do Bi",
+          "quantity": 1,
+          "price": null,
+          "category": "Uncategorized"
+        },
+        {
+          "name": "& ot Ses",
+          "quantity": 1,
+          "price": 254,
+          "category": "Uncategorized"
+        },
+        {
+          "name": "Jo Mame eels zou] go",
+          "quantity": 1,
+          "price": null,
+          "category": "Uncategorized"
+        },
+        {
+          "name": "i",
+          "quantity": 1,
+          "price": null,
+          "category": "Uncategorized"
+        },
+        {
+          "name": "Ts",
+          "quantity": 1,
+          "price": null,
+          "category": "Uncategorized"
+        },
+        {
+          "name": "ENS  ¥ oT",
+          "quantity": 1,
+          "price": null,
+          "category": "Uncategorized"
+        },
+        {
+          "name": "Authorisid Signatory",
+          "quantity": 1,
+          "price": null,
+          "category": "Uncategorized"
+        },
+        {
+          "name": "__",
+          "quantity": 1,
+          "price": null,
+          "category": "Uncategorized"
+        }
+      ],
+      "createdAt": "2026-03-28T14:49:42.735Z"
+    },
+    {
+      "id": "7b6ff162-9760-4e64-8604-5aba035f6644",
+      "ownerUid": "dev",
+      "path": "E:\\download\\Tally_OCR_based_billing_system-main\\Tally_OCR_based_billing_system-main\\server\\uploads\\1774710201888_8ce6d912-bff7-4bc4-9322-eafb7338010d.jpg",
+      "downloadURL": "/uploads/1774710201888_8ce6d912-bff7-4bc4-9322-eafb7338010d.jpg",
+      "contentType": "image/jpeg",
+      "size": 160607,
+      "ocrText": "KACHA BILL\nRouGH STOCK ESTIMATE\n© Date: 28/03/2026 Ref. No: K-1042\nSN. a TaEEATTIOCT TorAL\nI. | Lays (Classic Salted) 20 50 1000\n2. | Maaza (600ml) 40 24 960\n2. | Britannia Biscuits 10 100 1000\n4. | Kurkure (Masala Munch)| 20 60 1200\n5: Dairy Milk | | 10 40 400 g\n‘6. Uncle Chips 20 30 600 $\n7. | Hide & Seek Biscuits 30 20 600 |\n= le ToTAL STOCK VALUE: Z 5,160 \\\nNotes: ~ Check expiry for Maaza [Biscuits next week.\n— Restock Kurkure if daily sales > 10.\n",
+      "items": [
+        {
+          "name": "KACHA BILL",
+          "quantity": 1,
+          "price": null,
+          "category": "Uncategorized"
+        },
+        {
+          "name": "RouGH STOCK ESTIMATE",
+          "quantity": 1,
+          "price": null,
+          "category": "Uncategorized"
+        },
+        {
+          "name": "© Date: 28/03/2026 Ref. No: K",
+          "quantity": 1,
+          "price": 1042,
+          "category": "Uncategorized"
+        },
+        {
+          "name": "SN. a TaEEATTIOCT TorAL",
+          "quantity": 1,
+          "price": null,
+          "category": "Uncategorized"
+        },
+        {
+          "name": "I. | Lays (Classic Salted) 20 50",
+          "quantity": 1,
+          "price": 1000,
+          "category": "Uncategorized"
+        },
+        {
+          "name": "2. | Maaza (600ml) 40 24",
+          "quantity": 1,
+          "price": 960,
+          "category": "Uncategorized"
+        },
+        {
+          "name": "2. | Britannia Biscuits 10 100",
+          "quantity": 1,
+          "price": 1000,
+          "category": "Uncategorized"
+        },
+        {
+          "name": "4. | Kurkure (Masala Munch)| 20 60",
+          "quantity": 1,
+          "price": 1200,
+          "category": "Uncategorized"
+        },
+        {
+          "name": "5: Dairy Milk | | 10 40 400 g",
+          "quantity": 1,
+          "price": null,
+          "category": "Uncategorized"
+        },
+        {
+          "name": "‘6. Uncle Chips 20 30 600 $",
+          "quantity": 1,
+          "price": null,
+          "category": "Uncategorized"
+        },
+        {
+          "name": "7. | Hide & Seek Biscuits 30 20 600 |",
+          "quantity": 1,
+          "price": null,
+          "category": "Uncategorized"
+        },
+        {
+          "name": "= le ToTAL STOCK VALUE: Z 5,160 \\",
+          "quantity": 1,
+          "price": null,
+          "category": "Uncategorized"
+        },
+        {
+          "name": "Notes: ~ Check expiry for Maaza [Biscuits next week.",
+          "quantity": 1,
+          "price": null,
+          "category": "Uncategorized"
+        },
+        {
+          "name": "Restock Kurkure if daily sales >",
+          "quantity": 1,
+          "price": 10,
+          "category": "Uncategorized"
+        }
+      ],
+      "createdAt": "2026-03-28T15:03:22.013Z"
+    }
+  ],
+  "meta": {
+    "createdAt": "2025-11-06T19:45:06.665Z",
+    "updatedAt": "2026-03-28T15:06:37.354Z",
+    "version": 1
+  }
+}
