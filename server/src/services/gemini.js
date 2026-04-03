@@ -20,13 +20,13 @@ async function performGeminiOcr(imagePath) {
       console.warn('[Gemini] Could not list models via REST:', e.message);
     }
 
-    // Try a list of model names in order of preference
+    // Try a list of model names in order of preference (CALIBRATED FROM LOGS)
     const modelOptions = [
-      'gemini-1.5-flash-latest', 
+      'gemini-2.0-flash', 
       'gemini-1.5-flash', 
-      'gemini-2.0-flash-exp', 
-      'gemini-pro-vision',
-      'gemini-pro'
+      'gemini-1.5-flash-8b',
+      'gemini-1.5-pro',
+      'gemini-1.0-pro'
     ]
     
     // Read image file and convert to base64 Part object
