@@ -40,12 +40,8 @@ const POSView = () => {
 
   const [mobileTab, setMobileTab] = useState('products') // 'products' or 'cart'
 
-  useEffect(() => {
-    fetchProducts()
-    fetchGeneralSettings()
-  }, [])
-
-  const fetchGeneralSettings = async () => {
+  // --- HOISTED LOGIC FUNCTIONS ---
+  async function fetchGeneralSettings() {
     try {
       const res = await api.get('/api/settings')
       if (res.ok) {
@@ -56,7 +52,7 @@ const POSView = () => {
     }
   }
 
-  const fetchProducts = async () => {
+  async function fetchProducts() {
     try {
       const response = await api.get('/api/products')
       if (response.ok) {
@@ -68,7 +64,16 @@ const POSView = () => {
     }
   }
 
-  const addToCart = (product) => {
+  function calculateTotals(cartData = cart) {
+    const subtotal = cartData.reduce((sum, item) => sum + (item.price * item.quantity), 0)
+    const discountAmt = discount || 0
+    const taxable = Math.max(0, subtotal - discountAmt)
+    const tax = taxable * taxRate
+    const total = taxable + tax
+    return { subtotal, discountAmt, tax, total }
+  }
+
+  function addToCart(product) {
     const existing = cart.find(item => item.productId === product.id)
     if (existing) {
       setCart(cart.map(item =>
@@ -87,7 +92,7 @@ const POSView = () => {
     }
   }
 
-  const updateQuantity = (cartItemId, quantity) => {
+  function updateQuantity(cartItemId, quantity) {
     if (quantity <= 0) {
       removeFromCart(cartItemId)
     } else {
@@ -97,35 +102,29 @@ const POSView = () => {
     }
   }
 
-  const removeFromCart = (cartItemId) => {
+  function removeFromCart(cartItemId) {
     setCart(cart.filter(item => item.cartItemId !== cartItemId))
   }
 
-  const handleImageUpload = async (e) => {
+  async function handleImageUpload(e) {
     const file = e.target.files?.[0]
     if (!file) return
 
     setUploading(true)
     const formData = new FormData()
-    formData.append('mode', 'sale') // Ensures no inventory changes
+    formData.append('mode', 'sale')
     formData.append('image', file)
 
     try {
       const response = await api.postFormData('/api/upload', formData)
-
       const data = await response.json().catch(() => ({}))
       if (!response.ok) {
-        // Show detailed error message
-        const errorMsg = data?.error || data?.message || data?.details || `HTTP ${response.status}: ${response.statusText}`
-        console.error('Upload error:', { status: response.status, data, response })
+        const errorMsg = data?.error || data?.message || `HTTP ${response.status}`
         showToast('error', `Failed to process image: ${errorMsg}`)
         return
       }
 
-      if (data.warning && (!data.items || data.items.length === 0)) {
-        showToast('warning', data.warning)
-      } else if (data.items && data.items.length > 0) {
-        let added = 0
+      if (data.items && data.items.length > 0) {
         data.items.forEach(item => {
           setCart(prev => [...prev, {
             cartItemId: Date.now() + Math.random(),
@@ -134,79 +133,28 @@ const POSView = () => {
             price: item.price || 0,
             quantity: item.quantity || 1
           }])
-          added += 1
         })
-        showToast('success', `Added ${added} scanned item(s) straight to cart!`)
-      } else {
-        showToast('info', 'No items detected from the uploaded image')
+        showToast('success', `Added ${data.items.length} scanned item(s) to cart!`)
       }
     } catch (error) {
-      console.error('Upload failed:', error)
-      const errorMsg = error.message || 'Failed to process image. Please check your connection and try again.'
-      showToast('error', errorMsg)
+      showToast('error', 'Failed to process image.')
     } finally {
       setUploading(false)
-      e.target.value = '' // Allow uploading the same file again
+      e.target.value = ''
     }
   }
 
-  const calculateTotals = (cartData = cart) => {
-    const subtotal = cartData.reduce((sum, item) => sum + (item.price * item.quantity), 0)
-    const discountAmt = discount || 0
-    const taxable = Math.max(0, subtotal - discountAmt)
-    const tax = taxable * taxRate
-    const total = taxable + tax
-    return { subtotal, discountAmt, tax, total }
-  }
-
-  const handleCheckout = async () => {
+  async function handleCheckout() {
     if (cart.length === 0) {
       showToast('warning', 'Cart is empty')
       return
     }
-
-    // -- NEW: Out of Stock validation --
-    const outOfStockIds = []
-    const outOfStockDetails = []
-
-    cart.forEach(item => {
-      if (item.productId) {
-        const dbProduct = products.find(p => p.id === item.productId)
-        // If product found in state, check if cart wants MORE than what is available
-        const available = dbProduct ? (dbProduct.quantity || 0) : 0
-        if (item.quantity > available) {
-          outOfStockIds.push(item.cartItemId)
-          outOfStockDetails.push(`• ${item.name} (Need: ${item.quantity}, Stock: ${available})`)
-        }
-      }
-    })
-
-    let finalCart = cart
-    if (outOfStockIds.length > 0) {
-      const proceed = window.confirm(
-        `The following items exceed your available inventory stock:\n\n${outOfStockDetails.join('\n')}\n\nWould you like to automatically remove these items and proceed with billing the rest?`
-      )
-      if (!proceed) return
-
-      // Remove out-of-stock items and update state
-      finalCart = cart.filter(item => !outOfStockIds.includes(item.cartItemId))
-      setCart(finalCart)
-
-      if (finalCart.length === 0) {
-        showToast('warning', 'Checkout aborted: Cart emptied after removing out-of-stock items.')
-        return
-      }
-    }
-
-    // All checks passed or accepted, pop the modal instead of instant DB write!
-    // Dynamically HOT-FETCH the newest settings so the receipt instantly recognizes changes from the Settings Tab without a refresh.
     await fetchGeneralSettings()
     setShowCheckoutModal(true)
   }
 
-  const finalizeTransaction = async () => {
-    const { subtotal, discountAmt, tax, total } = calculateTotals()
-
+  async function finalizeTransaction() {
+    const { total, discountAmt } = calculateTotals()
     setCheckingOut(true)
     try {
       const response = await api.post('/api/transactions', {
@@ -215,25 +163,17 @@ const POSView = () => {
         taxRate,
         payments: [{ method: paymentMethod, amount: total }]
       })
-
-      const data = await response.json().catch(() => ({}))
       if (response.ok) {
-        showToast('success', 'Transaction logged to database successfully!')
-        
-        // Magically spool the hardware print job specifically required by Option 2!
+        showToast('success', 'Transaction logged successfully!')
         setTimeout(() => {
-          window.print() // This forces the browser OS Print Dialog strictly over the isolated #receipt-visualizer CSS block
+          window.print()
           setCart([])
           setDiscount(0)
           setShowCheckoutModal(false)
           fetchProducts()
         }, 300)
-      } else {
-        const msg = data?.error || 'Transaction failed'
-        showToast('error', msg)
       }
     } catch (error) {
-      console.error('Checkout failed:', error)
       showToast('error', 'Checkout failed')
     } finally {
       setCheckingOut(false)
@@ -243,6 +183,11 @@ const POSView = () => {
   const filteredProducts = products.filter(p =>
     p.name.toLowerCase().includes(searchQuery.toLowerCase())
   )
+
+  useEffect(() => {
+    fetchProducts()
+    fetchGeneralSettings()
+  }, [])
 
   const { subtotal, discountAmt, tax, total } = calculateTotals()
 
