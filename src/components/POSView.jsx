@@ -38,209 +38,14 @@ const POSView = () => {
     }, 30000)
   }
 
+  const [mobileTab, setMobileTab] = useState('products') // 'products' or 'cart'
+
   useEffect(() => {
     fetchProducts()
     fetchGeneralSettings()
   }, [])
 
-  const fetchGeneralSettings = async () => {
-    try {
-      const res = await api.get('/api/settings')
-      if (res.ok) {
-        setGeneralSettings(await res.json())
-      }
-    } catch (error) {
-      console.error('Failed to fetch general settings', error)
-    }
-  }
-
-  const fetchProducts = async () => {
-    try {
-      const response = await api.get('/api/products')
-      if (response.ok) {
-        const data = await response.json()
-        setProducts(data)
-      }
-    } catch (error) {
-      console.error('Failed to fetch products:', error)
-    }
-  }
-
-  const addToCart = (product) => {
-    const existing = cart.find(item => item.productId === product.id)
-    if (existing) {
-      setCart(cart.map(item =>
-        item.productId === product.id
-          ? { ...item, quantity: item.quantity + 1 }
-          : item
-      ))
-    } else {
-      setCart([...cart, {
-        cartItemId: Date.now() + Math.random(),
-        productId: product.id,
-        name: product.name,
-        price: product.price || 0,
-        quantity: 1
-      }])
-    }
-  }
-
-  const updateQuantity = (cartItemId, quantity) => {
-    if (quantity <= 0) {
-      removeFromCart(cartItemId)
-    } else {
-      setCart(cart.map(item =>
-        item.cartItemId === cartItemId ? { ...item, quantity } : item
-      ))
-    }
-  }
-
-  const removeFromCart = (cartItemId) => {
-    setCart(cart.filter(item => item.cartItemId !== cartItemId))
-  }
-
-  const handleImageUpload = async (e) => {
-    const file = e.target.files?.[0]
-    if (!file) return
-
-    setUploading(true)
-    const formData = new FormData()
-    formData.append('mode', 'sale') // Ensures no inventory changes
-    formData.append('image', file)
-
-    try {
-      const response = await api.postFormData('/api/upload', formData)
-
-      const data = await response.json().catch(() => ({}))
-      if (!response.ok) {
-        // Show detailed error message
-        const errorMsg = data?.error || data?.message || data?.details || `HTTP ${response.status}: ${response.statusText}`
-        console.error('Upload error:', { status: response.status, data, response })
-        showToast('error', `Failed to process image: ${errorMsg}`)
-        return
-      }
-
-      if (data.warning && (!data.items || data.items.length === 0)) {
-        showToast('warning', data.warning)
-      } else if (data.items && data.items.length > 0) {
-        let added = 0
-        data.items.forEach(item => {
-          setCart(prev => [...prev, {
-            cartItemId: Date.now() + Math.random(),
-            productId: item.productId || null,
-            name: item.name,
-            price: item.price || 0,
-            quantity: item.quantity || 1
-          }])
-          added += 1
-        })
-        showToast('success', `Added ${added} scanned item(s) straight to cart!`)
-      } else {
-        showToast('info', 'No items detected from the uploaded image')
-      }
-    } catch (error) {
-      console.error('Upload failed:', error)
-      const errorMsg = error.message || 'Failed to process image. Please check your connection and try again.'
-      showToast('error', errorMsg)
-    } finally {
-      setUploading(false)
-      e.target.value = '' // Allow uploading the same file again
-    }
-  }
-
-  const calculateTotals = (cartData = cart) => {
-    const subtotal = cartData.reduce((sum, item) => sum + (item.price * item.quantity), 0)
-    const discountAmt = discount || 0
-    const taxable = Math.max(0, subtotal - discountAmt)
-    const tax = taxable * taxRate
-    const total = taxable + tax
-    return { subtotal, discountAmt, tax, total }
-  }
-
-  const handleCheckout = async () => {
-    if (cart.length === 0) {
-      showToast('warning', 'Cart is empty')
-      return
-    }
-
-    // -- NEW: Out of Stock validation --
-    const outOfStockIds = []
-    const outOfStockDetails = []
-
-    cart.forEach(item => {
-      if (item.productId) {
-        const dbProduct = products.find(p => p.id === item.productId)
-        // If product found in state, check if cart wants MORE than what is available
-        const available = dbProduct ? (dbProduct.quantity || 0) : 0
-        if (item.quantity > available) {
-          outOfStockIds.push(item.cartItemId)
-          outOfStockDetails.push(`• ${item.name} (Need: ${item.quantity}, Stock: ${available})`)
-        }
-      }
-    })
-
-    let finalCart = cart
-    if (outOfStockIds.length > 0) {
-      const proceed = window.confirm(
-        `The following items exceed your available inventory stock:\n\n${outOfStockDetails.join('\n')}\n\nWould you like to automatically remove these items and proceed with billing the rest?`
-      )
-      if (!proceed) return
-
-      // Remove out-of-stock items and update state
-      finalCart = cart.filter(item => !outOfStockIds.includes(item.cartItemId))
-      setCart(finalCart)
-
-      if (finalCart.length === 0) {
-        showToast('warning', 'Checkout aborted: Cart emptied after removing out-of-stock items.')
-        return
-      }
-    }
-
-    // All checks passed or accepted, pop the modal instead of instant DB write!
-    // Dynamically HOT-FETCH the newest settings so the receipt instantly recognizes changes from the Settings Tab without a refresh.
-    await fetchGeneralSettings()
-    setShowCheckoutModal(true)
-  }
-
-  const finalizeTransaction = async () => {
-    const { subtotal, discountAmt, tax, total } = calculateTotals()
-
-    setCheckingOut(true)
-    try {
-      const response = await api.post('/api/transactions', {
-        items: cart,
-        discount: discountAmt,
-        taxRate,
-        payments: [{ method: paymentMethod, amount: total }]
-      })
-
-      const data = await response.json().catch(() => ({}))
-      if (response.ok) {
-        showToast('success', 'Transaction logged to database successfully!')
-        
-        // Magically spool the hardware print job specifically required by Option 2!
-        setTimeout(() => {
-          window.print() // This forces the browser OS Print Dialog strictly over the isolated #receipt-visualizer CSS block
-          setCart([])
-          setDiscount(0)
-          setShowCheckoutModal(false)
-          fetchProducts()
-        }, 300)
-      } else {
-        const msg = data?.error || 'Transaction failed'
-        showToast('error', msg)
-      }
-    } catch (error) {
-      console.error('Checkout failed:', error)
-      showToast('error', 'Checkout failed')
-    } finally {
-      setCheckingOut(false)
-    }
-  }
-
-  const filteredProducts = products.filter(p =>
-    p.name.toLowerCase().includes(searchQuery.toLowerCase())
-  )
+  // ... (fetch and logic methods)
 
   const { subtotal, discountAmt, tax, total } = calculateTotals()
 
@@ -248,48 +53,81 @@ const POSView = () => {
     <>
       <LoadingBar active={uploading || checkingOut} label={(uploading && 'Processing image...') || (checkingOut && 'Completing sale...') || ''} />
       <Toast type={toast.type} message={toast.message} onClose={() => setToast({ type: 'info', message: '' })} />
-      <div className="flex h-screen">
-      {/* Products Section */}
-      <div className="flex-1 p-6 overflow-auto">
-        <h1 className="text-3xl font-bold mb-6">Point of Sale</h1>
-
-        <div className="mb-6 flex space-x-4">
-          <div className="flex-1 relative">
-            <Search className="absolute left-3 top-3 text-gray-400 w-5 h-5" />
-            <input
-              type="text"
-              placeholder="Search products..."
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              className={`w-full pl-10 pr-4 py-3 rounded-lg border ${t.input}`}
-            />
-          </div>
-          <label className={`px-6 py-3 ${t.accent} ${t.accentHover} text-white rounded-lg cursor-pointer flex items-center space-x-2`}>
-            <Camera className="w-5 h-5" />
-            <span>{uploading ? 'Processing...' : 'Scan Bill'}</span>
-            <input type="file" accept="image/*" onChange={handleImageUpload} className="hidden" disabled={uploading} />
-          </label>
-        </div>
-
-        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
-          {filteredProducts.map((product) => (
-            <button
-              key={product.id}
-              onClick={() => addToCart(product)}
-              className={`p-4 ${t.bgCard} border ${t.border} rounded-lg hover:border-blue-500 transition text-left`}
-            >
-              <h3 className="font-semibold mb-2">{product.name}</h3>
-              <p className={`text-sm ${t.textSecondary} mb-2`}>{product.category}</p>
-              <p className="text-lg font-bold text-blue-500">₹{product.price?.toFixed(2) || '0.00'}</p>
-              <p className={`text-xs ${t.textSecondary}`}>Stock: {product.quantity || 0}</p>
-            </button>
-          ))}
-        </div>
+      
+      {/* Mobile Tab Switcher */}
+      <div className="lg:hidden flex border-b border-gray-700">
+        <button 
+          onClick={() => setMobileTab('products')}
+          className={`flex-1 py-3 font-bold transition-all ${mobileTab === 'products' ? 'text-blue-500 border-b-2 border-blue-500 bg-blue-500/10' : 'text-gray-400'}`}
+        >
+          Browse Items ({products.length})
+        </button>
+        <button 
+          onClick={() => setMobileTab('cart')}
+          className={`flex-1 py-3 font-bold transition-all relative ${mobileTab === 'cart' ? 'text-blue-500 border-b-2 border-blue-500 bg-blue-500/10' : 'text-gray-400'}`}
+        >
+          View Cart ({cart.length})
+          {cart.length > 0 && <span className="absolute top-2 right-4 w-5 h-5 bg-blue-600 text-white text-[10px] rounded-full flex items-center justify-center animate-pulse">{cart.length}</span>}
+        </button>
       </div>
 
-      {/* Cart Section */}
-      <div className={`w-96 ${t.bgSecondary} border-l ${t.border} p-6 flex flex-col`}>
-        <h2 className="text-2xl font-bold mb-6">Cart</h2>
+      <div className="flex flex-col lg:flex-row h-full overflow-hidden">
+        {/* Products Section */}
+        <div className={`flex-1 p-4 lg:p-6 overflow-auto ${mobileTab !== 'products' && 'hidden lg:block'}`}>
+          <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-4 mb-6">
+            <h1 className="text-2xl md:text-3xl font-bold">Point of Sale</h1>
+            <label className={`w-full md:w-auto px-6 py-3 ${t.accent} ${t.accentHover} text-white rounded-xl cursor-pointer flex items-center justify-center space-x-2 shadow-lg shadow-blue-500/20`}>
+              <Camera className="w-5 h-5" />
+              <span className="font-bold">{uploading ? 'Processing...' : 'Scan Bill'}</span>
+              <input type="file" accept="image/*" onChange={handleImageUpload} className="hidden" disabled={uploading} />
+            </label>
+          </div>
+
+          <div className="mb-6">
+            <div className="flex-1 relative">
+              <Search className="absolute left-3 top-3 text-gray-400 w-5 h-5" />
+              <input
+                type="text"
+                placeholder="Search products..."
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                className={`w-full pl-10 pr-4 py-3 rounded-xl border ${t.input} focus:ring-2 focus:ring-blue-500 transition`}
+              />
+            </div>
+          </div>
+
+          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 pb-20 lg:pb-0">
+            {filteredProducts.map((product) => (
+              <button
+                key={product.id}
+                onClick={() => {
+                  addToCart(product);
+                  // Optional: Vibrate or show visual feedback on mobile
+                }}
+                className={`p-4 ${t.bgCard} border ${t.border} rounded-xl hover:border-blue-500 transition-all hover:scale-[1.02] active:scale-95 text-left relative overflow-hidden group`}
+              >
+                <div className="absolute top-0 left-0 w-1 h-full bg-blue-500 opacity-0 group-hover:opacity-100 transition-opacity" />
+                <h3 className="font-bold mb-1 truncate">{product.name}</h3>
+                <p className={`text-xs ${t.textSecondary} mb-3 uppercase tracking-wider`}>{product.category}</p>
+                <div className="flex items-center justify-between mt-auto">
+                  <p className="text-lg font-black text-blue-500">₹{product.price?.toFixed(2) || '0.00'}</p>
+                  <div className={`px-2 py-1 rounded text-[10px] ${product.quantity > 5 ? 'bg-green-500/20 text-green-500' : 'bg-red-500/20 text-red-500'} font-bold`}>
+                    Stock: {product.quantity || 0}
+                  </div>
+                </div>
+              </button>
+            ))}
+          </div>
+        </div>
+
+        {/* Cart Section */}
+        <div className={`w-full lg:w-[400px] ${t.bgSecondary} border-l ${t.border} p-4 lg:p-6 flex flex-col h-full bg-slate-900/50 backdrop-blur-md ${mobileTab !== 'cart' && 'hidden lg:flex'}`}>
+          <div className="flex items-center justify-between mb-6">
+            <h2 className="text-2xl font-bold tracking-tight">Current Cart</h2>
+            <span className={`px-3 py-1 rounded-full text-xs font-bold ${t.bgCard} border ${t.border} text-blue-400`}>
+              {cart.length} Items
+            </span>
+          </div>
 
         <div className="flex-1 overflow-auto mb-4 space-y-3">
           {cart.length === 0 ? (

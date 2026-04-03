@@ -2,7 +2,7 @@ import React from 'react'
 import { ShoppingCart, Package, Users, BarChart3, Settings, LogOut, Sun, Moon } from 'lucide-react'
 import { useTheme } from '../context/ThemeContext'
 
-const Sidebar = ({ activeView, setActiveView, onLogout }) => {
+const Sidebar = ({ activeView, setActiveView, onLogout, onClose }) => {
   const { t, isDarkMode, toggleTheme } = useTheme()
 
   const menuItems = [
@@ -14,8 +14,8 @@ const Sidebar = ({ activeView, setActiveView, onLogout }) => {
   ]
 
   return (
-    <div className={`w-64 ${t.bgSecondary} border-r ${t.border} flex flex-col h-screen`}>
-      <div className="p-6 border-b border-gray-700">
+    <div className={`w-72 lg:w-64 ${t.bgSecondary} border-r ${t.border} flex flex-col h-full shadow-2xl lg:shadow-none`}>
+      <div className="p-6 border-b border-gray-700 flex items-center justify-between">
         <div className="flex items-center space-x-3">
           <img 
             src="/logo.png" 
@@ -26,6 +26,12 @@ const Sidebar = ({ activeView, setActiveView, onLogout }) => {
             AI POS
           </span>
         </div>
+        <button 
+          onClick={onClose}
+          className="lg:hidden p-2 hover:bg-gray-700/50 rounded-lg transition text-gray-400"
+        >
+          <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+        </button>
       </div>
 
       <nav className="flex-1 p-4 space-y-2">

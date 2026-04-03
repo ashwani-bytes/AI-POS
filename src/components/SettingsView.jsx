@@ -65,14 +65,14 @@ const SettingsView = () => {
   }
 
   return (
-    <div className="p-6 relative">
+    <div className="p-4 md:p-6 relative pb-24">
       <Toast type={toast.type} message={toast.message} onClose={() => setToast({ type: 'info', message: '' })} />
-      <div className="flex justify-between items-center mb-6">
-        <h1 className="text-3xl font-bold">Store Configuration</h1>
+      <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-8">
+        <h1 className="text-2xl md:text-3xl font-bold">Store Configuration</h1>
         <button 
           onClick={handleSave} 
           disabled={saving}
-          className={`px-8 py-3 ${t.accent} ${t.accentHover} font-bold text-white rounded-lg shadow-lg hover:shadow-xl transition-all disabled:opacity-50`}
+          className={`w-full md:w-auto px-8 py-3 ${t.accent} ${t.accentHover} font-bold text-white rounded-xl shadow-lg shadow-blue-500/20 transition-all disabled:opacity-50 active:scale-95`}
         >
           {saving ? 'Saving...' : 'SAVE ALL SETTINGS'}
         </button>

@@ -159,8 +159,8 @@ const CustomersView = () => {
         </div>
       </div>
 
-      <div className={`${t.bgCard} rounded-lg border ${t.border} overflow-hidden`}>
-        <table className="w-full">
+      <div className={`${t.bgCard} rounded-lg border ${t.border} overflow-x-auto scrollbar-hide`}>
+        <table className="w-full min-w-[700px]">
           <thead className={`${t.bgSecondary}`}>
             <tr>
               <th className="text-left p-4">Name</th>
