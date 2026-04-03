@@ -14,8 +14,17 @@ function ensureFirebaseInitialized() {
   let privateKey = process.env.FIREBASE_PRIVATE_KEY
 
   if (projectId && clientEmail && privateKey) {
-    // Handle escaped newlines in private key
+    // 🛡️ Robust parsing for Render/Environment variables
+    // 1. Strip surrounding quotes if they exist
+    privateKey = privateKey.trim().replace(/^["']|["']$/g, '')
+    
+    // 2. Handle both literal newlines and escaped \n strings
     privateKey = privateKey.replace(/\\n/g, '\n')
+    
+    // 3. Ensure headers exist (optional but defensive)
+    if (!privateKey.includes('-----BEGIN PRIVATE KEY-----')) {
+       console.warn('[Firebase] Private Key might be missing headers!')
+    }
     
     admin.initializeApp({
       credential: admin.credential.cert({
