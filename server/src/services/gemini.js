@@ -10,36 +10,25 @@ async function performGeminiOcr(imagePath) {
  
     const genAI = new GoogleGenerativeAI(apiKey)
     
-    // Log available models to help with debugging 404 errors
-    let availableModels = []
+    // Log available models to help with debugging 404 errors (using REST API as SDK method is missing)
     try {
-      // Correct way to list models from the main SDK object
-      const result = await genAI.listModels();
-      availableModels = result.models.map(m => m.name.replace('models/', ''));
-      console.log('[Gemini] Available models for this key:', availableModels.join(', '));
+      const axios = require('axios');
+      const resp = await axios.get(`https://generativelanguage.googleapis.com/v1beta/models?key=${apiKey}`);
+      const modelNames = resp.data.models.map(m => m.name.replace('models/', ''));
+      console.log('[Gemini] Available models (via REST):', modelNames.join(', '));
     } catch (e) {
-      console.warn('[Gemini] Could not list models:', e.message);
+      console.warn('[Gemini] Could not list models via REST:', e.message);
     }
 
     // Try a list of model names in order of preference
-    const modelOptions = ['gemini-1.5-flash-latest', 'gemini-1.5-flash', 'gemini-pro']
-    let model;
-    let selectedModelName = 'none';
-
-    for (const modelName of modelOptions) {
-      try {
-        console.log(`[Gemini] Checking access for ${modelName}...`);
-        model = genAI.getGenerativeModel({ model: modelName });
-        selectedModelName = modelName;
-        break; 
-      } catch (err) {
-        console.warn(`[Gemini] Skipping ${modelName}:`, err.message);
-      }
-    }
-
-    if (!model) throw new Error("No Gemini models available for this API key.");
-
-
+    const modelOptions = [
+      'gemini-1.5-flash-latest', 
+      'gemini-1.5-flash', 
+      'gemini-2.0-flash-exp', 
+      'gemini-pro-vision',
+      'gemini-pro'
+    ]
+    
     // Read image file and convert to base64 Part object
     const imageBytes = fs.readFileSync(imagePath)
     const ext = path.extname(imagePath).toLowerCase()
@@ -75,7 +64,27 @@ Example Output:
 ]
 `
 
-    const result = await model.generateContent([prompt, imagePart])
+    // ACTUAL execution loop
+    let result;
+    let selectedModelName = 'none';
+
+    for (const modelName of modelOptions) {
+      try {
+        console.log(`[Gemini] Trying ${modelName}...`);
+        const testModel = genAI.getGenerativeModel({ model: modelName });
+        result = await testModel.generateContent([prompt, imagePart]);
+        selectedModelName = modelName;
+        console.log(`[Gemini] SUCCESS with ${modelName}!`);
+        break; 
+      } catch (err) {
+        console.warn(`[Gemini] Model ${modelName} failed:`, err.message);
+        if (err.message.includes('404')) continue; // Try next one
+        throw err; // Re-throw if it's a 401 (Auth) or other fatal error
+      }
+    }
+
+    if (!result) throw new Error("All Gemini models failed. Please check your API key and permissions.");
+ 
     let text = result.response.text()
     
     // Clean markdown if accidentally returned
