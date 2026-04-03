@@ -8,8 +8,8 @@ async function performGeminiOcr(imagePath) {
     if (!apiKey) throw new Error("Missing GEMINI_API_KEY in .env")
 
     const genAI = new GoogleGenerativeAI(apiKey)
-    // Use gemini-1.5-flash, the latest stable model
-    const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" })
+    // Use gemini-1.5-flash with the stable v1 API to avoid v1beta 404 issues
+    const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" }, { apiVersion: 'v1' })
 
     // Read image file and convert to base64 Part object
     const imageBytes = fs.readFileSync(imagePath)
