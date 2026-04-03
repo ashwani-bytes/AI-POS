@@ -1,6 +1,6 @@
 import { getCurrentIdToken } from './firebase'
 
-export const API_BASE = import.meta.env.VITE_API_BASE || 'http://localhost:4000'
+export const API_BASE = "https://ai-pos-0kn2.onrender.com";
 
 export function apiUrl(path) {
   const basePath = path.startsWith('/') ? path : `/${path}`

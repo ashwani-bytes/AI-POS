@@ -31,21 +31,39 @@ app.use(compression())
 const limiter = rateLimit({ windowMs: 60 * 1000, max: 200 })
 app.use(limiter)
 
-// CORS
-const cors = require('cors');
+// CORS Configuration
+const allowedOrigins = [
+  "http://localhost:3000",
+  "http://localhost:5173",
+  "https://ai-pos-one.vercel.app"
+];
+
+// Add CORS_ORIGIN from .env (comma-separated)
+if (process.env.CORS_ORIGIN) {
+  const envOrigins = process.env.CORS_ORIGIN.split(',').map(o => o.trim());
+  allowedOrigins.push(...envOrigins);
+}
+
+// Add FRONTEND_URL from environment if available
+if (process.env.FRONTEND_URL) {
+  allowedOrigins.push(process.env.FRONTEND_URL);
+}
 
 app.use(cors({
-  origin: [
-    "http://localhost:3000",
-    "http://localhost:5173",
-    "https://ai-pos-one.vercel.app" // 👈 YOUR ACTUAL FRONTEND URL
-  ],
-  credentials: true
-}));
-app.use(cors({ 
-  origin: corsOrigins,
+  origin: (origin, callback) => {
+    // Allow requests with no origin (like mobile apps or curl requests)
+    if (!origin) return callback(null, true);
+    if (allowedOrigins.indexOf(origin) !== -1 || allowedOrigins.includes('*')) {
+      callback(null, true);
+    } else {
+      console.warn(`[CORS] Blocked request from origin: ${origin}`);
+      callback(new Error('Not allowed by CORS'));
+    }
+  },
   credentials: true,
-}))
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS', 'PATCH'],
+  allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With', 'Accept'],
+}));
 
 // Parsers & logging
 app.use(express.json({ limit: '10mb' }))
