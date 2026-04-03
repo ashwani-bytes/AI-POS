@@ -32,21 +32,16 @@ const limiter = rateLimit({ windowMs: 60 * 1000, max: 200 })
 app.use(limiter)
 
 // CORS
-let corsOrigins = process.env.CORS_ORIGIN ? process.env.CORS_ORIGIN.split(',').map(s => s.trim()).filter(Boolean) : null
-if (!corsOrigins || corsOrigins.length === 0) {
-  corsOrigins = [
-    'http://localhost:3000',
-    'http://localhost:3001',
-    'http://localhost:5173',
-    'http://127.0.0.1:3000',
-    'http://127.0.0.1:3001',
-    'http://127.0.0.1:5173',
+const cors = require('cors');
 
-    'https://ai-pos.vercel.app'
-
-
-  ]
-}
+app.use(cors({
+  origin: [
+    "http://localhost:3000",
+    "http://localhost:5173",
+    "https://ai-pos-one.vercel.app" // 👈 YOUR ACTUAL FRONTEND URL
+  ],
+  credentials: true
+}));
 app.use(cors({ 
   origin: corsOrigins,
   credentials: true,
