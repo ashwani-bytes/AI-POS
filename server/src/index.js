@@ -87,6 +87,23 @@ app.get('/api/health/db', async (req, res) => {
   }
 })
 
+// Debug - Check Environment Variables (Masked)
+app.get('/api/health/debug', (req, res) => {
+  res.json({
+    firebase: {
+      projectId: process.env.FIREBASE_PROJECT_ID ? 'Set' : 'Missing',
+      clientEmail: process.env.FIREBASE_CLIENT_EMAIL ? 'Set' : 'Missing',
+      privateKey: process.env.FIREBASE_PRIVATE_KEY ? `${process.env.FIREBASE_PRIVATE_KEY.length} chars` : 'Missing',
+      privateKeySnippet: process.env.FIREBASE_PRIVATE_KEY ? process.env.FIREBASE_PRIVATE_KEY.substring(0, 30) + '...' : null
+    },
+    gemini: process.env.GEMINI_API_KEY ? 'Set' : 'Missing',
+    frontendUrl: process.env.FRONTEND_URL || 'Not Set',
+    nodeEnv: process.env.NODE_ENV,
+    port: process.env.PORT,
+    version: '1.0.1'
+  })
+})
+
 // Auth session endpoints (unprotected)
 app.use('/api/auth', authRouter)
 

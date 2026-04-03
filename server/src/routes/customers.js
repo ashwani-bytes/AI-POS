@@ -13,7 +13,7 @@ router.post('/', async (req, res) => {
     const snap = await doc.get()
     res.json({ id: doc.id, ...snap.data() })
   } catch (e) {
-    res.status(500).json({ error: 'Failed to create customer' })
+    res.status(500).json({ error: `Create customer failed: ${e.message}`, details: e.message })
   }
 })
 
@@ -33,7 +33,7 @@ router.get('/', async (req, res) => {
     })
     res.json(items)
   } catch (e) {
-    res.status(500).json({ error: 'Failed to list customers' })
+    res.status(500).json({ error: `List customers failed: ${e.message}`, details: e.message })
   }
 })
 

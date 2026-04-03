@@ -23,7 +23,7 @@ router.post('/', async (req, res) => {
     res.json({ id: doc.id, ...snap.data() })
   } catch (e) {
     console.error('[Products] Create error:', e.message)
-    res.status(500).json({ error: 'Failed to create product', details: e.message })
+    res.status(500).json({ error: `Create product failed: ${e.message}`, details: e.message })
   }
 })
 
@@ -46,7 +46,7 @@ router.get('/', async (req, res) => {
     res.json(items)
   } catch (e) {
     console.error('[Products] List error:', e.message)
-    res.status(500).json({ error: 'Failed to list products', details: e.message })
+    res.status(500).json({ error: `List products failed: ${e.message}`, details: e.message })
   }
 })
 

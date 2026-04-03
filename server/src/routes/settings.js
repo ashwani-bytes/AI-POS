@@ -14,7 +14,7 @@ router.get('/', async (req, res) => {
     res.json(doc.data())
   } catch (error) {
     console.error('Fetch settings error:', error)
-    res.status(500).json({ error: 'Failed to fetch settings' })
+    res.status(500).json({ error: `Fetch settings failed: ${error.message}`, details: error.message })
   }
 })
 
@@ -31,7 +31,7 @@ router.post('/', async (req, res) => {
     res.json({ success: true })
   } catch (error) {
     console.error('Save settings error:', error)
-    res.status(500).json({ error: 'Failed to save settings' })
+    res.status(500).json({ error: `Save settings failed: ${error.message}`, details: error.message })
   }
 })
 
