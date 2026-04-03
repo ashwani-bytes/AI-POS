@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 # 🤖 AI POS - Intelligent Point of Sale System
 
 > A next-generation Point of Sale system supercharged with AI for automated bill scanning, smart inventory management, and intelligent analytics.
@@ -150,3 +151,7 @@ Visit `http://localhost:5173` to rely on the app.
 ## 📄 License
 
 Distributed under the MIT License.
+=======
+# AI-POS
+AI-driven POS system for smart billing, inventory tracking, and real-time sales analytics.
+>>>>>>> 0b5e05cb2f9ac05425f9da2be711c2566d8779c3
