@@ -4,21 +4,41 @@ const path = require('path')
 
 async function performGeminiOcr(imagePath) {
   try {
-    const apiKey = process.env.GEMINI_API_KEY
+    // 🛡️ Auto-trim the API Key to prevent common whitespace errors
+    const apiKey = (process.env.GEMINI_API_KEY || '').trim()
     if (!apiKey) throw new Error("Missing GEMINI_API_KEY in .env")
-
+ 
     const genAI = new GoogleGenerativeAI(apiKey)
     
     // Log available models to help with debugging 404 errors
+    let availableModels = []
     try {
-      const result = await genAI.getGenerativeModel({ model: "gemini-1.5-flash-latest" }).listModels();
-      console.log('[Gemini] Available models for this key:', result.models.map(m => m.name).join(', '));
+      // Correct way to list models from the main SDK object
+      const result = await genAI.listModels();
+      availableModels = result.models.map(m => m.name.replace('models/', ''));
+      console.log('[Gemini] Available models for this key:', availableModels.join(', '));
     } catch (e) {
       console.warn('[Gemini] Could not list models:', e.message);
     }
 
-    // Use gemini-1.5-flash-latest which is often more reliable than the versioned name
-    const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash-latest" })
+    // Try a list of model names in order of preference
+    const modelOptions = ['gemini-1.5-flash-latest', 'gemini-1.5-flash', 'gemini-pro']
+    let model;
+    let selectedModelName = 'none';
+
+    for (const modelName of modelOptions) {
+      try {
+        console.log(`[Gemini] Checking access for ${modelName}...`);
+        model = genAI.getGenerativeModel({ model: modelName });
+        selectedModelName = modelName;
+        break; 
+      } catch (err) {
+        console.warn(`[Gemini] Skipping ${modelName}:`, err.message);
+      }
+    }
+
+    if (!model) throw new Error("No Gemini models available for this API key.");
+
 
     // Read image file and convert to base64 Part object
     const imageBytes = fs.readFileSync(imagePath)
