@@ -31,47 +31,25 @@ const POSView = () => {
   const [paymentMethod, setPaymentMethod] = useState('cash')
   const [generalSettings, setGeneralSettings] = useState(null)
   const [toast, setToast] = useState({ type: 'info', message: '' })
-  const showToast = (type, message) => {
+  const [mobileTab, setMobileTab] = useState('products') // 'products' or 'cart'
+
+  function showToast(type, message) {
     setToast({ type, message })
     setTimeout(() => {
       setToast(prev => prev.message === message ? { type: 'info', message: '' } : prev)
     }, 30000)
   }
 
-  const [mobileTab, setMobileTab] = useState('products') // 'products' or 'cart'
+  // --- CRITICAL CALCULATION LOGIC ---
+  function calculateTotals(cartData = cart) {
+    const s = cartData.reduce((sum, item) => sum + (item.price * item.quantity), 0)
+    const d = discount || 0
+    const tx = Math.max(0, s - d) * taxRate
+    const tt = Math.max(0, s - d) + tx
+    return { subtotal: s, discountAmt: d, tax: tx, total: tt }
+  }
 
   // --- HOISTED LOGIC FUNCTIONS ---
-  async function fetchGeneralSettings() {
-    try {
-      const res = await api.get('/api/settings')
-      if (res.ok) {
-        setGeneralSettings(await res.json())
-      }
-    } catch (error) {
-      console.error('Failed to fetch general settings', error)
-    }
-  }
-
-  async function fetchProducts() {
-    try {
-      const response = await api.get('/api/products')
-      if (response.ok) {
-        const data = await response.json()
-        setProducts(data)
-      }
-    } catch (error) {
-      console.error('Failed to fetch products:', error)
-    }
-  }
-
-  function calculateTotals(cartData = cart) {
-    const subtotal = cartData.reduce((sum, item) => sum + (item.price * item.quantity), 0)
-    const discountAmt = discount || 0
-    const taxable = Math.max(0, subtotal - discountAmt)
-    const tax = taxable * taxRate
-    const total = taxable + tax
-    return { subtotal, discountAmt, tax, total }
-  }
 
   function addToCart(product) {
     const existing = cart.find(item => item.productId === product.id)
