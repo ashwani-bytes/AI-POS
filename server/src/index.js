@@ -83,13 +83,11 @@ app.use('/api/reports', auth, reportsRouter)
 app.use('/api/stream', auth, streamRouter)
 app.use('/api/settings', auth, settingsRouter)
 
-const PORT = process.env.PORT || 4000
+const PORT = process.env.PORT || 4000;
+
 const server = app.listen(PORT, () => {
-  console.log(`\n✅ AI POS server listening on port ${PORT}`)
-  console.log(`   Mode: Local JSON Store (no Firebase required)`)
-  console.log(`   API:  http://localhost:${PORT}/api/health`)
-  console.log(`   Data: server/data/db.json\n`)
-})
+  console.log(`✅ AI POS server listening on port ${PORT}`);
+});
 
 server.on('error', (err) => {
   if (err.code === 'EADDRINUSE') {
