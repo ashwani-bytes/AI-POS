@@ -207,364 +207,346 @@ const POSView = () => {
       <Toast type={toast.type} message={toast.message} onClose={() => setToast({ type: 'info', message: '' })} />
       
       {/* Mobile Tab Switcher */}
-      <div className="lg:hidden flex border-b border-gray-700">
+      <div className="lg:hidden flex glass-surface border-b border-white/10 relative z-20">
         <button 
           onClick={() => setMobileTab('products')}
-          className={`flex-1 py-3 font-bold transition-all ${mobileTab === 'products' ? 'text-blue-500 border-b-2 border-blue-500 bg-blue-500/10' : 'text-gray-400'}`}
+          className={`flex-1 py-4 font-black tracking-tighter uppercase transition-all duration-500 relative ${mobileTab === 'products' ? 'text-blue-400' : 'text-slate-500'}`}
         >
-          Browse Items ({products.length})
+          Browse Items
+          {mobileTab === 'products' && <div className="absolute bottom-0 left-0 w-full h-1 bg-blue-500 shadow-[0_0_10px_rgba(59,130,246,0.5)]" />}
         </button>
         <button 
           onClick={() => setMobileTab('cart')}
-          className={`flex-1 py-3 font-bold transition-all relative ${mobileTab === 'cart' ? 'text-blue-500 border-b-2 border-blue-500 bg-blue-500/10' : 'text-gray-400'}`}
+          className={`flex-1 py-4 font-black tracking-tighter uppercase transition-all duration-500 relative ${mobileTab === 'cart' ? 'text-blue-400' : 'text-slate-500'}`}
         >
           View Cart ({cart.length})
+          {mobileTab === 'cart' && <div className="absolute bottom-0 left-0 w-full h-1 bg-blue-500 shadow-[0_0_10px_rgba(59,130,246,0.5)]" />}
           {cart.length > 0 && <span className="absolute top-2 right-4 w-5 h-5 bg-blue-600 text-white text-[10px] rounded-full flex items-center justify-center animate-pulse">{cart.length}</span>}
         </button>
       </div>
 
-      <div className="flex flex-col lg:flex-row h-full overflow-hidden">
+      <div className="flex flex-col lg:flex-row h-full overflow-hidden bg-slate-950">
         {/* Products Section */}
-        <div className={`flex-1 p-4 lg:p-6 overflow-auto ${mobileTab !== 'products' && 'hidden lg:block'}`}>
-          <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-4 mb-6">
-            <h1 className="text-2xl md:text-3xl font-bold">Point of Sale</h1>
-            <label className={`w-full md:w-auto px-6 py-3 ${t.accent} ${t.accentHover} text-white rounded-xl cursor-pointer flex items-center justify-center space-x-2 shadow-lg shadow-blue-500/20`}>
+        <div className={`flex-1 p-4 lg:p-8 overflow-auto relative ${mobileTab !== 'products' && 'hidden lg:block'}`}>
+          {/* Decorative Glows */}
+          <div className="absolute top-0 right-0 w-96 h-96 bg-blue-600/5 rounded-full blur-[120px] pointer-events-none" />
+          
+          <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-6 mb-8 relative z-10">
+            <div>
+              <h1 className="text-3xl md:text-4xl font-black tracking-tighter text-white">Marketplace</h1>
+              <p className="text-slate-500 font-bold uppercase tracking-widest text-xs mt-1">Select items for the new order</p>
+            </div>
+            <label className={`w-full md:w-auto px-8 py-4 ${t.accent} ${t.accentHover} text-white rounded-2xl cursor-pointer flex items-center justify-center space-x-3 elastic-hover hover:scale-105 active:scale-95 transition-all`}>
               <Camera className="w-5 h-5" />
-              <span className="font-bold">{uploading ? 'Processing...' : 'Scan Bill'}</span>
+              <span className="font-black uppercase tracking-tighter">{uploading ? 'Analyzing...' : 'Scan Bill'}</span>
               <input type="file" accept="image/*" onChange={handleImageUpload} className="hidden" disabled={uploading} />
             </label>
           </div>
 
-          <div className="mb-6">
-            <div className="flex-1 relative">
-              <Search className="absolute left-3 top-3 text-gray-400 w-5 h-5" />
+          <div className="mb-8 relative z-10">
+            <div className="flex-1 relative group">
+              <Search className="absolute left-4 top-4 text-slate-500 w-5 h-5 group-focus-within:text-blue-500 transition-colors" />
               <input
                 type="text"
-                placeholder="Search products..."
+                placeholder="Find a product..."
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                className={`w-full pl-10 pr-4 py-3 rounded-xl border ${t.input} focus:ring-2 focus:ring-blue-500 transition`}
+                className={`w-full pl-12 pr-4 py-4 rounded-2xl glass-card focus:ring-2 focus:ring-blue-500/50 outline-none transition-all placeholder:text-slate-600 font-bold`}
               />
             </div>
           </div>
 
-          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 pb-20 lg:pb-0">
-            {filteredProducts.map((product) => (
+          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 xl:grid-cols-4 gap-6 pb-24 lg:pb-0 relative z-10">
+            {filteredProducts.map((product, idx) => (
               <button
                 key={product.id}
-                onClick={() => {
-                  addToCart(product);
-                  // Optional: Vibrate or show visual feedback on mobile
-                }}
-                className={`p-4 ${t.bgCard} border ${t.border} rounded-xl hover:border-blue-500 transition-all hover:scale-[1.02] active:scale-95 text-left relative overflow-hidden group`}
+                onClick={() => addToCart(product)}
+                style={{ animationDelay: `${idx * 50}ms` }}
+                className={`p-5 glass-card rounded-3xl elastic-hover text-left relative overflow-hidden group animate-reveal opacity-0`}
               >
-                <div className="absolute top-0 left-0 w-1 h-full bg-blue-500 opacity-0 group-hover:opacity-100 transition-opacity" />
-                <h3 className="font-bold mb-1 truncate">{product.name}</h3>
-                <p className={`text-xs ${t.textSecondary} mb-3 uppercase tracking-wider`}>{product.category}</p>
-                <div className="flex items-center justify-between mt-auto">
-                  <p className="text-lg font-black text-blue-500">₹{product.price?.toFixed(2) || '0.00'}</p>
-                  <div className={`px-2 py-1 rounded text-[10px] ${product.quantity > 5 ? 'bg-green-500/20 text-green-500' : 'bg-red-500/20 text-red-500'} font-bold`}>
-                    Stock: {product.quantity || 0}
+                <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-blue-500 to-cyan-400 opacity-0 group-hover:opacity-100 transition-opacity" />
+                <div className="flex justify-between items-start mb-4">
+                  <div className={`p-2 rounded-xl bg-blue-500/10 text-blue-400 group-hover:bg-blue-500 group-hover:text-white transition-all duration-500`}>
+                    <Plus className="w-5 h-5" />
+                  </div>
+                  <div className={`px-2 py-1 rounded-lg text-[10px] font-black uppercase tracking-tighter ${product.quantity > 5 ? 'bg-emerald-500/10 text-emerald-400' : 'bg-rose-500/10 text-rose-400'}`}>
+                    Qty: {product.quantity || 0}
                   </div>
                 </div>
+                <h3 className="font-black text-lg mb-1 truncate text-white">{product.name}</h3>
+                <p className="text-xs text-slate-500 font-bold uppercase tracking-widest mb-4">{product.category}</p>
+                <p className="text-2xl font-black text-blue-400 tabular-nums">₹{product.price?.toFixed(2) || '0.00'}</p>
               </button>
             ))}
           </div>
         </div>
 
         {/* Cart Section */}
-        <div className={`w-full lg:w-[400px] ${t.bgSecondary} border-l ${t.border} p-4 lg:p-6 flex flex-col h-full bg-slate-900/50 backdrop-blur-md ${mobileTab !== 'cart' && 'hidden lg:flex'}`}>
-          <div className="flex items-center justify-between mb-6">
-            <h2 className="text-2xl font-bold tracking-tight">Current Cart</h2>
-            <span className={`px-3 py-1 rounded-full text-xs font-bold ${t.bgCard} border ${t.border} text-blue-400`}>
-              {cart.length} Items
-            </span>
+        <div className={`w-full lg:w-[450px] glass-surface p-4 lg:p-8 flex flex-col h-full relative z-20 ${mobileTab !== 'cart' && 'hidden lg:flex'}`}>
+          <div className="flex items-center justify-between mb-8">
+            <div>
+              <h2 className="text-2xl font-black tracking-tighter text-white">Your Cart</h2>
+              <p className="text-slate-500 text-xs font-bold uppercase tracking-widest mt-1">Review items before checkout</p>
+            </div>
+            <div className="px-4 py-2 glass-card rounded-2xl text-blue-400 font-black tabular-nums border-blue-500/20">
+              {cart.length} ITEMS
+            </div>
           </div>
 
-        <div className="flex-1 overflow-auto mb-4 space-y-3">
+        <div className="flex-1 overflow-auto mb-6 space-y-4 pr-2 custom-scrollbar">
           {cart.length === 0 ? (
-            <p className={t.textSecondary}>Cart is empty</p>
+            <div className="h-full flex flex-col items-center justify-center text-center p-8 glass-card rounded-3xl border-dashed">
+              <div className="w-16 h-16 bg-slate-800 rounded-full flex items-center justify-center mb-4">
+                <ShoppingCart className="w-8 h-8 text-slate-600" />
+              </div>
+              <p className="text-slate-500 font-bold uppercase tracking-widest text-xs">The cart is currently empty</p>
+            </div>
           ) : (
             cart.map((item, idx) => (
-              <div key={item.cartItemId || idx} className={`p-3 ${t.bgCard} rounded-lg border ${t.border}`}>
-                <div className="flex justify-between items-start mb-2">
-                  <h3 className="font-semibold">{item.name}</h3>
+              <div key={item.cartItemId || idx} className="p-4 glass-card rounded-2xl border-white/5 hover:border-blue-500/30 transition-colors group">
+                <div className="flex justify-between items-start mb-3">
+                  <h3 className="font-black text-white group-hover:text-blue-400 transition-colors">{item.name}</h3>
                   <button
                     onClick={() => removeFromCart(item.cartItemId)}
-                    className="text-red-500 hover:text-red-400"
+                    className="text-slate-600 hover:text-rose-500 transition-colors p-1"
                   >
                     <Trash2 className="w-4 h-4" />
                   </button>
                 </div>
                 <div className="flex items-center justify-between">
-                  <div className="flex items-center space-x-2">
+                  <div className="flex items-center p-1 glass-card rounded-xl border-white/5">
                     <button
                       onClick={() => updateQuantity(item.cartItemId, item.quantity - 1)}
-                      className={`px-2 py-1 ${t.bgSecondary} rounded`}
+                      className="w-8 h-8 flex items-center justify-center hover:bg-white/5 rounded-lg text-slate-400 transition-colors"
                     >
                       -
                     </button>
-                    <span className="w-8 text-center">{item.quantity}</span>
+                    <span className="w-10 text-center font-black text-white px-2">{item.quantity}</span>
                     <button
                       onClick={() => updateQuantity(item.cartItemId, item.quantity + 1)}
-                      className={`px-2 py-1 ${t.bgSecondary} rounded`}
+                      className="w-8 h-8 flex items-center justify-center hover:bg-white/5 rounded-lg text-slate-400 transition-colors"
                     >
                       +
                     </button>
                   </div>
-                  <p className="font-bold">₹{(item.price * item.quantity).toFixed(2)}</p>
+                  <p className="font-black text-white text-lg">₹{(item.price * item.quantity).toFixed(2)}</p>
                 </div>
               </div>
             ))
           )}
         </div>
 
-        <div className="space-y-3 mb-4">
-          <div>
-            <label className={`block text-sm mb-2 ${t.textSecondary}`}>Discount (₹)</label>
-            <input
-              type="number"
-              value={discount}
-              onChange={(e) => setDiscount(Number(e.target.value))}
-              className={`w-full px-4 py-2 rounded-lg border ${t.input}`}
-              min="0"
-            />
-          </div>
-          <div>
-            <label className={`block text-sm mb-2 ${t.textSecondary}`}>Tax Rate (%)</label>
-            <input
-              type="number"
-              value={(taxRate * 100).toFixed(0)}
-              onChange={(e) => setTaxRate(Number(e.target.value) / 100)}
-              className={`w-full px-4 py-2 rounded-lg border ${t.input}`}
-              min="0"
-              max="100"
-            />
+        <div className="space-y-4 mb-8">
+          <div className="grid grid-cols-2 gap-4">
+            <div className="glass-card p-4 rounded-2xl">
+              <label className="block text-[10px] font-black uppercase tracking-widest text-slate-500 mb-2">Discount (₹)</label>
+              <input
+                type="number"
+                value={discount}
+                onChange={(e) => setDiscount(Number(e.target.value))}
+                className="w-full bg-transparent text-white font-black text-xl outline-none"
+                min="0"
+              />
+            </div>
+            <div className="glass-card p-4 rounded-2xl">
+              <label className="block text-[10px] font-black uppercase tracking-widest text-slate-500 mb-2">Tax Rate (%)</label>
+              <input
+                type="number"
+                value={(taxRate * 100).toFixed(0)}
+                onChange={(e) => setTaxRate(Number(e.target.value) / 100)}
+                className="w-full bg-transparent text-white font-black text-xl outline-none"
+                min="0"
+              />
+            </div>
           </div>
         </div>
 
-        <div className={`border-t ${t.border} pt-4 space-y-2`}>
-          <div className="flex justify-between">
-            <span className={t.textSecondary}>Subtotal:</span>
-            <span className="font-semibold">₹{subtotal.toFixed(2)}</span>
+        <div className="glass-card p-6 rounded-3xl border-white/10 space-y-3 mb-6 relative overflow-hidden group">
+          <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-blue-600 to-indigo-600" />
+          <div className="flex justify-between text-xs font-bold uppercase tracking-widest text-slate-500">
+            <span>Subtotal</span>
+            <span className="text-white font-black">₹{subtotal.toFixed(2)}</span>
           </div>
-          <div className="flex justify-between">
-            <span className={t.textSecondary}>Discount:</span>
-            <span className="font-semibold text-red-500">-₹{discountAmt.toFixed(2)}</span>
+          <div className="flex justify-between text-xs font-bold uppercase tracking-widest text-slate-500">
+            <span>Discount Applied</span>
+            <span className="text-rose-400 font-black">-₹{discountAmt.toFixed(2)}</span>
           </div>
-          <div className="flex justify-between">
-            <span className={t.textSecondary}>Tax ({(taxRate * 100).toFixed(0)}%):</span>
-            <span className="font-semibold">₹{tax.toFixed(2)}</span>
+          <div className="flex justify-between text-xs font-bold uppercase tracking-widest text-slate-500">
+            <span>GST ({(taxRate * 100).toFixed(0)}%)</span>
+            <span className="text-white font-black">₹{tax.toFixed(2)}</span>
           </div>
-          <div className="flex justify-between text-xl font-bold pt-2 border-t border-gray-700">
-            <span>Total:</span>
-            <span className="text-blue-500">₹{total.toFixed(2)}</span>
+          <div className="flex justify-between text-3xl font-black pt-4 border-t border-white/5">
+            <span className="text-white tracking-tighter">Total</span>
+            <span className="text-blue-400 tabular-nums shadow-blue-500/20">₹{total.toFixed(2)}</span>
           </div>
         </div>
 
         <button
           onClick={handleCheckout}
           disabled={cart.length === 0 || checkingOut}
-          className={`w-full mt-4 py-4 ${t.accent} ${t.accentHover} text-white rounded-lg font-bold text-lg disabled:opacity-50 disabled:cursor-not-allowed`}
+          className={`w-full py-5 ${t.accent} ${t.accentHover} text-white rounded-3xl font-black text-xl uppercase tracking-tighter shadow-2xl disabled:opacity-30 elastic-hover active:scale-95 transition-all mb-4`}
         >
-          {checkingOut ? 'Processing...' : 'Complete Sale'}
+          {checkingOut ? 'Processing...' : 'Complete Session'}
         </button>
       </div>
       </div>
 
       {/* --- CHECKOUT MODAL & INVOICE RENDER --- */}
       {showCheckoutModal && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm p-4">
-          <div className="bg-white text-black w-full max-w-2xl rounded-xl shadow-2xl flex flex-col max-h-[90vh]">
+        <div className="fixed inset-0 z-[100] flex items-center justify-center p-4">
+          <div className="absolute inset-0 bg-slate-950/80 backdrop-blur-xl animate-fade-in" onClick={() => setShowCheckoutModal(false)} />
+          <div className="glass-card w-full max-w-4xl rounded-[40px] shadow-3xl flex flex-col max-h-[90vh] relative z-10 border-white/20 animate-reveal overflow-hidden">
             
             {/* Header */}
-            <div className="flex justify-between items-center p-6 border-b border-gray-200">
-              <h2 className="text-2xl font-bold font-serif tracking-wide text-gray-800">Checkout</h2>
-              <button onClick={() => setShowCheckoutModal(false)} className="text-gray-500 hover:text-red-500 transition-colors">
-                 <span className="text-3xl font-light">&times;</span>
+            <div className="flex justify-between items-center p-8 border-b border-white/5 glass-surface">
+              <div>
+                <h2 className="text-3xl font-black tracking-tighter text-white">Finalize Sale</h2>
+                <p className="text-slate-500 text-xs font-bold uppercase tracking-widest mt-1">Select payment method below</p>
+              </div>
+              <button 
+                onClick={() => setShowCheckoutModal(false)} 
+                className="w-12 h-12 flex items-center justify-center glass-card rounded-2xl text-slate-400 hover:text-white transition-colors"
+              >
+                <span className="text-2xl font-light">&times;</span>
               </button>
             </div>
 
-            <div className="flex-1 overflow-auto p-8 grid md:grid-cols-2 gap-8 bg-gray-50">
-              {/* Receipt Visualizer (Hard-mapped for USB spooler via id) */}
-              <div id="receipt-visualizer" className="bg-white p-6 shadow-sm border border-gray-200" style={{ fontFamily: 'monospace' }}>
-                <div className="text-center mb-6">
-                  {generalSettings?.receiptHeader && <p className="text-xs text-gray-500 mb-2 italic">"{generalSettings.receiptHeader}"</p>}
-                  <h3 className="text-xl font-bold uppercase tracking-widest text-gray-900 border-b-2 border-gray-900 pb-2 inline-block">
-                    {generalSettings?.storeName || 'M/S STORE ENTERPRISES'}
-                  </h3>
-                  <p className="text-sm mt-2 text-gray-600 whitespace-pre-wrap">
-                    {generalSettings?.storeAddress || 'GSTIN: 27AAAAA0000A1Z5'}
-                  </p>
-                  <p className="text-sm text-gray-600">Tax Invoice</p>
-                  <p className="text-xs text-gray-500 mt-1">{new Date().toLocaleString()}</p>
-                </div>
+            <div className="flex-1 overflow-auto p-4 md:p-10 grid lg:grid-cols-2 gap-10">
+              {/* Receipt Visualizer */}
+              <div className="glass-card p-8 rounded-3xl border-white/5 bg-white/5 relative group">
+                <div id="receipt-visualizer" className="bg-white p-8 rounded-xl shadow-inner text-slate-900" style={{ fontFamily: 'monospace' }}>
+                  <div className="text-center mb-8 border-b-2 border-slate-900 pb-4">
+                    <h3 className="text-2xl font-black uppercase tracking-tighter">
+                      {generalSettings?.storeName || 'AI POS PRO'}
+                    </h3>
+                    <p className="text-[10px] mt-2 whitespace-pre-wrap font-bold text-slate-600">
+                      {generalSettings?.storeAddress || 'DIGITAL ENTERPRISE VERSION'}
+                    </p>
+                    <p className="text-xs font-black mt-2 bg-slate-900 text-white inline-block px-2 py-1">TAX INVOICE</p>
+                  </div>
 
-                <div className="border-t border-b border-dashed border-gray-400 py-2 mb-4">
-                  <table className="w-full text-sm">
+                  <table className="w-full text-xs border-collapse mb-8">
                     <thead>
-                      <tr className="text-left text-gray-600">
-                        <th className="pb-2 font-semibold">Item</th>
-                        <th className="pb-2 font-semibold text-center">Qty</th>
-                        <th className="pb-2 font-semibold text-right">Amt</th>
+                      <tr className="border-b-2 border-slate-300">
+                        <th className="pb-2 text-left font-black">ITEM</th>
+                        <th className="pb-2 text-center font-black">QTY</th>
+                        <th className="pb-2 text-right font-black">AMT</th>
                       </tr>
                     </thead>
-                    <tbody>
+                    <tbody className="divide-y divide-slate-100">
                       {cart.map(item => (
-                        <tr key={item.cartItemId} className="align-top">
-                          <td className="py-2 pr-2 leading-tight max-w-[120px] truncate">{item.name}</td>
-                          <td className="py-2 text-center text-gray-600">{item.quantity}</td>
-                          <td className="py-2 text-right">₹{(item.price * item.quantity).toFixed(2)}</td>
+                        <tr key={item.cartItemId}>
+                          <td className="py-3 font-bold truncate max-w-[140px]">{item.name}</td>
+                          <td className="py-3 text-center font-bold">{item.quantity}</td>
+                          <td className="py-3 text-right font-bold">₹{(item.price * item.quantity).toFixed(2)}</td>
                         </tr>
                       ))}
                     </tbody>
                   </table>
-                </div>
 
-                <div className="space-y-1 text-sm text-gray-600 ml-auto w-48 mb-4">
-                  <div className="flex justify-between">
-                    <span>Subtotal</span>
-                    <span>₹{subtotal.toFixed(2)}</span>
-                  </div>
-                  {discountAmt > 0 && (
-                    <div className="flex justify-between text-red-500">
-                      <span>Discount</span>
-                      <span>-₹{discountAmt.toFixed(2)}</span>
+                  <div className="space-y-2 text-xs font-bold ml-auto w-48 border-t-2 border-slate-900 pt-4">
+                    <div className="flex justify-between">
+                      <span>SUBTOTAL</span>
+                      <span>₹{subtotal.toFixed(2)}</span>
                     </div>
-                  )}
-                  <div className="flex justify-between">
-                    <span>GST ({(taxRate * 100).toFixed(0)}%)</span>
-                    <span>₹{tax.toFixed(2)}</span>
+                    {discountAmt > 0 && (
+                      <div className="flex justify-between text-rose-600">
+                        <span>DISCOUNT</span>
+                        <span>-₹{discountAmt.toFixed(2)}</span>
+                      </div>
+                    )}
+                    <div className="flex justify-between">
+                      <span>GST ({(taxRate * 100).toFixed(0)}%)</span>
+                      <span>₹{tax.toFixed(2)}</span>
+                    </div>
+                    <div className="flex justify-between text-xl font-black mt-4 border-t-2 border-slate-900 pt-2">
+                      <span>TOTAL</span>
+                      <span>₹{total.toFixed(2)}</span>
+                    </div>
                   </div>
-                  <div className="flex justify-between font-bold text-gray-900 text-lg border-t border-gray-900 mt-2 pt-2">
-                    <span>TOTAL</span>
-                    <span>₹{total.toFixed(2)}</span>
+                  <div className="text-center font-black text-[10px] tracking-widest mt-10 pt-4 border-t border-dashed border-slate-300">
+                    {generalSettings?.receiptFooter || 'PROCESSED VIA AI POS SYSTEM'}
                   </div>
-                </div>
-                <div className="text-center font-bold text-sm tracking-widest mt-6 pb-2">
-                  {generalSettings?.receiptFooter || '*** THANK YOU ***'}
                 </div>
               </div>
 
               {/* Payment Processing */}
-              <div className="flex flex-col space-y-6">
+              <div className="flex flex-col space-y-8">
                 <div>
-                  <h3 className="text-lg font-bold text-gray-800 mb-3 uppercase tracking-wide">1. Select Payment</h3>
+                  <h3 className="text-xs font-black text-slate-500 uppercase tracking-widest mb-6">Payment Category</h3>
                   <div className="grid grid-cols-2 gap-4">
                     <button 
                       onClick={() => setPaymentMethod('cash')}
-                      className={`py-4 px-2 rounded-xl flex flex-col md:flex-row items-center justify-center gap-2 border-2 transition-all font-bold ${paymentMethod === 'cash' ? 'border-emerald-500 bg-emerald-50 text-emerald-700 shadow-md' : 'border-gray-200 text-gray-500 hover:border-emerald-300 hover:bg-emerald-50'}`}
+                      className={`group p-6 glass-card rounded-[32px] border-2 transition-all duration-500 flex flex-col items-center ${paymentMethod === 'cash' ? 'border-emerald-500 bg-emerald-500/10' : 'border-white/5 hover:border-emerald-500/50'}`}
                     >
-                      <span className="text-2xl">💵</span>
-                      CASH
+                      <div className={`w-12 h-12 rounded-2xl flex items-center justify-center mb-4 text-2xl transition-all duration-500 ${paymentMethod === 'cash' ? 'bg-emerald-500 text-white scale-110 rotate-12' : 'bg-slate-800 text-slate-500 group-hover:scale-110'}`}>💵</div>
+                      <span className={`font-black uppercase tracking-tighter ${paymentMethod === 'cash' ? 'text-emerald-400' : 'text-slate-500'}`}>Cash</span>
                     </button>
                     <button 
                       onClick={() => setPaymentMethod('upi')}
-                      className={`py-4 px-2 rounded-xl flex flex-col md:flex-row items-center justify-center gap-2 border-2 transition-all font-bold ${paymentMethod === 'upi' ? 'border-blue-500 bg-blue-50 text-blue-700 shadow-md' : 'border-gray-200 text-gray-500 hover:border-blue-300 hover:bg-blue-50'}`}
+                      className={`group p-6 glass-card rounded-[32px] border-2 transition-all duration-500 flex flex-col items-center ${paymentMethod === 'upi' ? 'border-blue-500 bg-blue-500/10' : 'border-white/5 hover:border-blue-500/50'}`}
                     >
-                      <span className="text-2xl">📱</span>
-                      UPI / QR
+                      <div className={`w-12 h-12 rounded-2xl flex items-center justify-center mb-4 text-2xl transition-all duration-500 ${paymentMethod === 'upi' ? 'bg-blue-500 text-white scale-110 -rotate-12' : 'bg-slate-800 text-slate-500 group-hover:scale-110'}`}>📱</div>
+                      <span className={`font-black uppercase tracking-tighter ${paymentMethod === 'upi' ? 'text-blue-400' : 'text-slate-500'}`}>UPI QR</span>
                     </button>
                   </div>
                 </div>
 
-                {/* Optional QR Code Render */}
                 {paymentMethod === 'upi' && (
-                  <div className="flex-1 flex flex-col items-center justify-center bg-white border border-gray-200 rounded-xl p-4 shadow-sm relative overflow-hidden">
-                    <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-blue-400 to-indigo-500"></div>
-                    <p className="text-xs font-bold text-gray-400 uppercase tracking-widest mb-3">Scan to Pay Exact Amount</p>
+                  <div className="glass-card rounded-[40px] p-8 flex flex-col items-center justify-center animate-reveal border-blue-500/20 relative overflow-hidden">
+                    <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-blue-500 to-cyan-500" />
+                    <p className="text-[10px] font-black text-slate-500 uppercase tracking-[0.2em] mb-6">Scanning Channel Open</p>
                     {generalSettings?.upiId ? (
-                      <div className="relative group">
+                      <div className={`relative group p-4 glass-card rounded-3xl bg-white border-none shadow-2xl`}>
                         <img 
                           src={`https://api.qrserver.com/v1/create-qr-code/?size=300x300&data=${encodeURIComponent(
                             `upi://pay?pa=${generalSettings.upiId}&pn=${generalSettings?.storeName || 'Smart Store'}&am=${total.toFixed(2)}&cu=INR&tn=Bill%20from%20${encodeURIComponent(generalSettings?.storeName || 'Store')}&tr=${txnRef}`
                           )}`} 
                           alt="UPI QR Code"
-                          className="w-[200px] h-[200px] object-cover rounded-xl shadow-lg border-2 border-blue-50 transition-transform group-hover:scale-105"
+                          className="w-[200px] h-[200px] object-cover group-hover:scale-105 transition-transform duration-700"
                         />
-                        <div className="absolute -bottom-2 -right-2 bg-blue-600 text-white p-1 rounded-lg shadow-md">
-                          <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
-                        </div>
                       </div>
                     ) : (
-                      <div className="w-[180px] h-[180px] bg-gray-100 border-2 border-dashed border-gray-300 rounded-lg flex items-center justify-center p-4 text-center">
-                        <span className="text-sm text-gray-400 font-semibold">Please add your Merchant UPI ID in Settings to generate QR code.</span>
+                      <div className="glass-card p-10 rounded-3xl border-dashed border-slate-700 text-center">
+                        <p className="text-xs font-bold text-slate-500 uppercase tracking-widest leading-relaxed">Please configure Merchant UPI ID in settings to activate auto-QR.</p>
                       </div>
                     )}
-                    <div className="mt-5 px-6 py-3 bg-blue-50 text-blue-700 rounded-2xl font-black text-2xl tracking-tight border border-blue-100 shadow-inner">
+                    <div className="mt-8 px-8 py-4 glass-card rounded-2xl text-blue-400 font-black text-3xl tabular-nums shadow-blue-500/20 border-blue-500/20">
                        ₹ {total.toFixed(2)}
                     </div>
-                    <p className="text-[10px] text-gray-400 mt-2 font-mono uppercase tracking-widest">Reference: {txnRef}</p>
+                    <p className="text-[10px] text-slate-600 mt-4 tabular-nums font-bold tracking-widest">TRACE_ID: {txnRef}</p>
                   </div>
                 )}
+                
                 {paymentMethod === 'cash' && (
-                  <div className="flex-1 flex flex-col items-center justify-center bg-emerald-50/50 border border-emerald-100 rounded-xl p-4 text-center">
-                     <span className="text-5xl mb-4">🧾</span>
-                     <p className="text-emerald-800 font-semibold mb-1">Cash Register selected.</p>
-                     <p className="text-emerald-600 text-sm">Collect exactly ₹{total.toFixed(2)} from the customer.</p>
+                  <div className="glass-card rounded-[40px] p-10 flex flex-col items-center justify-center text-center animate-reveal border-emerald-500/20">
+                     <div className="w-20 h-20 bg-emerald-500/10 rounded-full flex items-center justify-center text-5xl mb-6 animate-pulse">💰</div>
+                     <h4 className="text-emerald-400 font-black text-xl tracking-tighter mb-2 italic">Awaiting Cash Collection</h4>
+                     <p className="text-slate-500 text-xs font-bold uppercase tracking-widest max-w-[200px]">Collect exactly ₹{total.toFixed(2)} from the customer.</p>
                   </div>
                 )}
               </div>
             </div>
 
-            {/* Modal Footer / Submit */}
-            <div className="p-6 border-t border-gray-200 bg-white rounded-b-xl flex flex-col gap-4">
-              
-              <div className="flex gap-4">
-                <button 
-                  onClick={() => setShowCheckoutModal(false)}
-                  className="flex-1 py-4 text-gray-600 bg-gray-100 font-bold rounded-xl hover:bg-gray-200 transition-colors"
-                >
-                  Cancel Checkout
-                </button>
-                <button 
-                  onClick={finalizeTransaction}
-                  disabled={checkingOut}
-                  className="flex-[2] py-4 bg-gray-900 text-white font-bold rounded-xl shadow-md hover:bg-black transition-all disabled:opacity-50 disabled:cursor-not-allowed flex justify-center items-center relative overflow-hidden group"
-                >
-                  <div className="absolute inset-0 bg-white/20 translate-y-full group-hover:translate-y-0 transition-transform"></div>
-                  <span className="relative z-10">{checkingOut ? 'Saving Protocol...' : `FINALIZE AND AUTO-PRINT (USB) ₹${total.toFixed(2)}`}</span>
-                </button>
-              </div>
-
-              {/* Hardware Printing Overrides */}
-              <div className="flex gap-4 border-t border-gray-100 pt-4">
-                 <button 
-                   onClick={() => window.print()}
-                   className="flex-1 py-3 text-gray-700 border-2 border-gray-200 font-bold rounded-xl hover:bg-gray-50 transition-colors flex items-center justify-center gap-2 text-sm"
-                 >
-                   <Printer className="w-4 h-4" /> Print USB Spool
-                 </button>
-                 <button 
-                   onClick={async () => {
-                      try {
-                        const device = await navigator.bluetooth.requestDevice({
-                          filters: [{ services: ['000018f0-0000-1000-8000-00805f9b34fb'] }],
-                          optionalServices: ['e7810a71-73ae-499d-8c15-faa9aef0c3f2']
-                        })
-                        const server = await device.gatt.connect()
-                        const service = await server.getPrimaryService('000018f0-0000-1000-8000-00805f9b34fb')
-                        const char = await service.getCharacteristic('00002af1-0000-1000-8000-00805f9b34fb')
-                        
-                        let txt = '\x1B\x40\x1B\x61\x01' + (generalSettings?.storeName || 'M/S STORE') + '\n\n\x1B\x61\x00'
-                        cart.forEach(i => txt += `${i.name.substring(0, 15)} x${i.quantity} : ${i.price}\n`)
-                        txt += `\nTOTAL: ${total}\n\n\x1B\x61\x01THANK YOU\n\n\n\n`
-                        
-                        await char.writeValue(new TextEncoder().encode(txt))
-                        showToast('success', 'Sent raw byte-code to BLE Printer!')
-                      } catch(e) { showToast('error', 'Bluetooth paired failed. Connection closed.') }
-                   }}
-                   className="flex-1 py-3 text-blue-700 bg-blue-50 border-2 border-blue-100 font-bold rounded-xl hover:bg-blue-100 transition-colors flex items-center justify-center gap-2 text-sm"
-                 >
-                   <Bluetooth className="w-4 h-4" /> Connect Bluetooth Printer
-                 </button>
-              </div>
-
+            {/* Footer */}
+            <div className="p-8 border-t border-white/5 glass-surface flex flex-col sm:flex-row gap-6">
+              <button 
+                onClick={() => setShowCheckoutModal(false)}
+                className="flex-1 py-5 glass-card text-slate-400 hover:text-white font-black uppercase tracking-tighter rounded-2xl elastic-hover transition-all"
+              >
+                Abort Session
+              </button>
+              <button 
+                onClick={finalizeTransaction}
+                disabled={checkingOut}
+                className={`flex-[2] py-5 ${t.accent} ${t.accentHover} text-white font-black uppercase tracking-tighter rounded-2xl shadow-3xl elastic-hover active:scale-95 transition-all flex items-center justify-center gap-3`}
+              >
+                {checkingOut ? 'Syncing Ledger...' : `Authorize & Print ₹${total.toFixed(2)}`}
+              </button>
             </div>
           </div>
         </div>
       )}
-
     </>
   )
 }
