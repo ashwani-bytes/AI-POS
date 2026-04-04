@@ -10,8 +10,8 @@ async function performGeminiOcr(imagePath) {
  
     const genAI = new GoogleGenerativeAI(apiKey)
     
-    // Use gemini-1.5-flash for much better free-tier rate limits
-    const modelName = 'gemini-1.5-flash'
+    // Updated to gemini-2.5-flash (confirmed current available model)
+    const modelName = 'gemini-2.5-flash'
     const model = genAI.getGenerativeModel({ model: modelName })
     
     // Read image file and convert to base64 Part object
