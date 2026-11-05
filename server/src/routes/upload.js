@@ -58,7 +58,7 @@ router.post('/', upload.single('image'), async (req, res) => {
       const aiResult = await performGeminiOcr(filePath)
       items = aiResult.items || []
       ocrResult.warning = aiResult.warning
-      ocrResult.text = "Parsed directly to JSON by Gemini"
+      ocrResult.text = `Parsed ${items.length} items with ${aiResult.modelUsed || 'Gemini'}`
       console.log('[Gemini] Extracted', items.length, 'items')
     } catch (parseError) {
       console.error('[Gemini] Error parsing OCR image:', parseError.message)
@@ -69,33 +69,42 @@ router.post('/', upload.single('image'), async (req, res) => {
     let productsAdded = 0
     const mode = req.body.mode || 'sale'
 
-    // Securely pre-fetch the user's inventory to map names without triggering indexing errors
-    const userProductsSnap = await db().collection('products').where('ownerUid', '==', uid).get()
+    // Fetch user's inventory consistently with products route
+    let prodQuery = db().collection('products')
+    if (uid && uid !== 'dev' && uid !== 'anonymous' && uid !== 'demo-user') {
+      prodQuery = prodQuery.where('ownerUid', '==', uid)
+    }
+    const userProductsSnap = await prodQuery.get()
     const productLookup = {}
     userProductsSnap.docs.forEach(d => {
-      productLookup[d.data().name.toLowerCase()] = { id: d.id, ...d.data() }
+      const pData = d.data()
+      if (pData.name) {
+        productLookup[pData.name.trim().toLowerCase()] = { id: d.id, ...pData }
+      }
     })
 
     for (const item of items) {
       try {
-        const matchName = item.name.toLowerCase()
+        const matchName = String(item.name || '').trim().toLowerCase()
         const matched = productLookup[matchName]
+        const cleanPrice = Number(item.price) || 0
+        const cleanQty = Number(item.quantity) || 1
 
         if (matched) {
           // Exact match found in store! Attach the ID so POS Checkouts deduct real stock.
           item.productId = matched.id
           
           if (mode === 'restock') {
-            const currentQty = matched.quantity || 0
+            const currentQty = Number(matched.quantity) || 0
             await db().collection('products').doc(matched.id).update({
-              quantity: currentQty + (item.quantity || 1),
+              quantity: currentQty + cleanQty,
               updatedAt: new Date().toISOString(),
             })
-            console.log(`[Inventory] Updated stock for "${item.name}": +${item.quantity || 1}`)
+            console.log(`[Inventory] Updated stock for "${item.name}": +${cleanQty}`)
             productsAdded++
           }
         } else {
-          // Product doesn't exist in stock. Null ID means it acts as a custom POS entry.
+          // Product doesn't exist in stock.
           item.productId = null
           
           if (mode === 'restock') {
@@ -103,9 +112,9 @@ router.post('/', upload.single('image'), async (req, res) => {
             const category = categorizeProduct(item.name)
             const newDocRef = await db().collection('products').add({
               name: item.name,
-              cost: item.price ? Math.round(item.price * 0.7) : null,
-              price: item.price || null,
-              quantity: item.quantity || 1,
+              cost: Number((cleanPrice * 0.7).toFixed(2)),
+              price: cleanPrice,
+              quantity: cleanQty,
               category,
               createdAt: new Date().toISOString(),
               updatedAt: new Date().toISOString(),

@@ -119,7 +119,7 @@ const handleGoogle = async () => {
         {isDarkMode ? <Sun className="w-5 h-5" /> : <Moon className="w-5 h-5" />}
       </button>
 
-      <div className={`w-full max-w-md ${t.bgSecondary} rounded-2xl border ${t.border} p-8`}>
+      <div className={`w-full max-w-md ${t.bgSecondary} rounded-3xl border-2 border-slate-300 dark:border-slate-800 shadow-2xl p-8`}>
         <div className="text-center mb-8">
           <div className="flex items-center justify-center space-x-2 mb-4">
             <ShoppingCart className="w-10 h-10 text-blue-500" />

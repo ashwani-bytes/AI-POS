@@ -3,7 +3,7 @@ import { ShoppingCart, Sun, Moon, Menu, X } from 'lucide-react'
 import { useTheme } from '../context/ThemeContext'
 
 const Navbar = ({ onGetStarted }) => {
-  const { t, isDarkMode, toggleTheme } = useTheme()
+  const { t, isDarkMode, toggleTheme, setTheme } = useTheme()
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
 
   return (
@@ -19,9 +19,34 @@ const Navbar = ({ onGetStarted }) => {
             <a href="#features" className={`${t.textSecondary} hover:${t.text} transition`}>Features</a>
             <a href="#benefits" className={`${t.textSecondary} hover:${t.text} transition`}>Benefits</a>
             <a href="#pricing" className={`${t.textSecondary} hover:${t.text} transition`}>Pricing</a>
-            <button onClick={toggleTheme} className={`p-2 rounded-lg ${t.bgCard} border ${t.border}`}>
-              {isDarkMode ? <Sun className="w-5 h-5" /> : <Moon className="w-5 h-5" />}
-            </button>
+            <div className="flex items-center p-1 bg-slate-200 dark:bg-slate-800 rounded-xl border border-slate-300 dark:border-slate-700">
+              <button
+                type="button"
+                onClick={() => setTheme('light')}
+                className={`flex items-center gap-1.5 py-1.5 px-3 rounded-lg text-xs font-black transition-all ${
+                  !isDarkMode 
+                    ? 'bg-white text-blue-700 shadow-sm' 
+                    : 'text-slate-600 dark:text-slate-400 hover:text-white'
+                }`}
+                title="Switch to Light Mode"
+              >
+                <Sun className={`w-3.5 h-3.5 ${!isDarkMode ? 'text-amber-500' : 'text-slate-400'}`} />
+                <span>Light</span>
+              </button>
+              <button
+                type="button"
+                onClick={() => setTheme('dark')}
+                className={`flex items-center gap-1.5 py-1.5 px-3 rounded-lg text-xs font-black transition-all ${
+                  isDarkMode 
+                    ? 'bg-slate-900 text-blue-400 shadow-sm' 
+                    : 'text-slate-600 dark:text-slate-400 hover:text-slate-900'
+                }`}
+                title="Switch to Dark Mode"
+              >
+                <Moon className={`w-3.5 h-3.5 ${isDarkMode ? 'text-indigo-400' : 'text-slate-400'}`} />
+                <span>Dark</span>
+              </button>
+            </div>
             <button onClick={onGetStarted} className={`px-6 py-2 ${t.accent} ${t.accentHover} text-white rounded-lg transition`}>
               Get Started
             </button>

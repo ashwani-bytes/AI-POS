@@ -1,3 +1,5 @@
+const path = require('path')
+require('dotenv').config({ path: path.join(__dirname, '..', '.env') })
 require('dotenv').config()
 const express = require('express')
 const cors = require('cors')
@@ -5,7 +7,6 @@ const morgan = require('morgan')
 const helmet = require('helmet')
 const compression = require('compression')
 const rateLimit = require('express-rate-limit')
-const path = require('path')
 
 const { ensureFirebaseInitialized } = require('./config/firebase')
 const auth = require('./middleware/auth')
@@ -96,11 +97,14 @@ app.get('/api/health/debug', (req, res) => {
       privateKey: process.env.FIREBASE_PRIVATE_KEY ? `${process.env.FIREBASE_PRIVATE_KEY.length} chars` : 'Missing',
       privateKeySnippet: process.env.FIREBASE_PRIVATE_KEY ? process.env.FIREBASE_PRIVATE_KEY.substring(0, 30) + '...' : null
     },
-    gemini: process.env.GEMINI_API_KEY ? 'Set' : 'Missing',
+    gemini: {
+      status: process.env.GEMINI_API_KEY ? 'Set' : 'Missing',
+      model: 'gemini-2.5-flash'
+    },
     frontendUrl: process.env.FRONTEND_URL || 'Not Set',
     nodeEnv: process.env.NODE_ENV,
     port: process.env.PORT,
-    version: '1.0.1'
+    version: '1.0.2'
   })
 })
 
@@ -133,3 +137,5 @@ server.on('error', (err) => {
     throw err
   }
 })
+
+module.exports = { app, server }

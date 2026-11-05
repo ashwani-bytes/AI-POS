@@ -27,14 +27,15 @@ const App = () => {
               return prev
             })
           } else {
-            setIsAuthenticated(false)
-            setCurrentPage((prev) => {
-              // Only redirect to landing if on dashboard
-              if (prev === 'dashboard') {
-                return 'landing'
-              }
-              return prev
-            })
+            // Check if there's a stored fallback token (e.g. demo mode)
+            const token = localStorage.getItem('token')
+            if (token === 'demo-token') {
+              setIsAuthenticated(true)
+              setCurrentPage('dashboard')
+            } else {
+              setIsAuthenticated(false)
+              setCurrentPage((prev) => (prev === 'dashboard' ? 'landing' : prev))
+            }
           }
         })
         return () => unsubscribe()
@@ -42,7 +43,7 @@ const App = () => {
     } else {
       // Demo mode: check localStorage for token
       const token = localStorage.getItem('token')
-      if (token && token !== 'demo-token') {
+      if (token) {
         setIsAuthenticated(true)
         setCurrentPage('dashboard')
       }
@@ -71,7 +72,7 @@ const App = () => {
   }
 
   return (
-    <ThemeProvider defaultDark={true}>
+    <ThemeProvider defaultDark={false}>
       {currentPage === 'landing' && (
         <LandingPage onGetStarted={() => setCurrentPage('auth')} />
       )}
