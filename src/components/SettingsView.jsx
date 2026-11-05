@@ -117,10 +117,10 @@ const SettingsView = () => {
   }
 
   return (
-    <div className={`p-5 md:p-8 ${t.bg} ${t.text} min-h-screen custom-scrollbar`}>
+    <div className={`p-4 sm:p-6 lg:p-8 ${t.bg} ${t.text} min-h-screen custom-scrollbar overflow-x-hidden min-w-0`}>
       <Toast type={toast.type} message={toast.message} onClose={() => setToast({ type: 'info', message: '' })} />
 
-      <div className="max-w-6xl mx-auto space-y-8">
+      <div className="max-w-6xl mx-auto space-y-6 sm:space-y-8 min-w-0">
         
         {/* Top Header */}
         <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 border-b-2 border-slate-300 dark:border-slate-800 pb-6">

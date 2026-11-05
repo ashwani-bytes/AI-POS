@@ -235,44 +235,44 @@ const ProductsView = () => {
   const totalStockUnits = products.reduce((sum, p) => sum + (Number(p.quantity) || 0), 0)
 
   return (
-    <div className="p-5 md:p-8 space-y-7 max-w-7xl mx-auto pb-28">
+    <div className="p-4 sm:p-6 lg:p-8 space-y-6 max-w-full mx-auto pb-28 overflow-x-hidden min-w-0">
       <LoadingBar active={saving} label={saving ? (editingProduct ? 'Updating product...' : 'Creating product...') : ''} />
       <Toast type={toast.type} message={toast.message} onClose={() => setToast({ type: 'info', message: '' })} />
 
       {/* Catalog KPI Overview Banner */}
-      <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-        <div className="p-5 rounded-2xl bg-white dark:bg-slate-900 border border-slate-300 dark:border-slate-800 shadow-md space-y-1.5 transition-all">
-          <span className="text-xs font-black text-slate-800 dark:text-slate-200 uppercase tracking-wider block">Catalog Items</span>
-          <p className="text-3xl md:text-4xl font-black text-blue-600 dark:text-blue-400">{products.length}</p>
-          <span className="text-xs md:text-sm text-slate-700 dark:text-slate-300 font-semibold block">Total registered SKU items</span>
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
+        <div className="p-4 sm:p-5 rounded-2xl bg-white dark:bg-slate-900 border border-slate-300 dark:border-slate-800 shadow-sm space-y-1 transition-all min-w-0">
+          <span className="text-[11px] sm:text-xs font-black text-slate-700 dark:text-slate-300 uppercase tracking-wider block truncate">Catalog Items</span>
+          <p className="text-2xl sm:text-3xl lg:text-4xl font-black text-blue-600 dark:text-blue-400">{products.length}</p>
+          <span className="text-xs text-slate-500 dark:text-slate-400 font-semibold block truncate">Total registered SKU items</span>
         </div>
-        <div className="p-5 rounded-2xl bg-white dark:bg-slate-900 border border-slate-300 dark:border-slate-800 shadow-md space-y-1.5 transition-all">
-          <span className="text-xs font-black text-slate-800 dark:text-slate-200 uppercase tracking-wider block">Total Inventory Units</span>
-          <p className="text-3xl md:text-4xl font-black text-emerald-600 dark:text-emerald-400">{totalStockUnits}</p>
-          <span className="text-xs md:text-sm text-slate-700 dark:text-slate-300 font-semibold block">Available across all shelves</span>
+        <div className="p-4 sm:p-5 rounded-2xl bg-white dark:bg-slate-900 border border-slate-300 dark:border-slate-800 shadow-sm space-y-1 transition-all min-w-0">
+          <span className="text-[11px] sm:text-xs font-black text-slate-700 dark:text-slate-300 uppercase tracking-wider block truncate">Total Inventory Units</span>
+          <p className="text-2xl sm:text-3xl lg:text-4xl font-black text-emerald-600 dark:text-emerald-400">{totalStockUnits}</p>
+          <span className="text-xs text-slate-500 dark:text-slate-400 font-semibold block truncate">Available across all shelves</span>
         </div>
-        <div className="p-5 rounded-2xl bg-white dark:bg-slate-900 border border-slate-300 dark:border-slate-800 shadow-md space-y-1.5 transition-all">
-          <span className="text-xs font-black text-slate-800 dark:text-slate-200 uppercase tracking-wider block">Low Stock Warnings</span>
-          <p className="text-3xl md:text-4xl font-black text-amber-600 dark:text-amber-400">{lowStockProducts.length}</p>
-          <span className="text-xs md:text-sm text-slate-700 dark:text-slate-300 font-semibold block">Under 5 units remaining</span>
+        <div className="p-4 sm:p-5 rounded-2xl bg-white dark:bg-slate-900 border border-slate-300 dark:border-slate-800 shadow-sm space-y-1 transition-all min-w-0">
+          <span className="text-[11px] sm:text-xs font-black text-slate-700 dark:text-slate-300 uppercase tracking-wider block truncate">Low Stock Warnings</span>
+          <p className="text-2xl sm:text-3xl lg:text-4xl font-black text-amber-600 dark:text-amber-400">{lowStockProducts.length}</p>
+          <span className="text-xs text-slate-500 dark:text-slate-400 font-semibold block truncate">Under 5 units remaining</span>
         </div>
-        <div className="p-5 rounded-2xl bg-white dark:bg-slate-900 border border-slate-300 dark:border-slate-800 shadow-md space-y-1.5 transition-all">
-          <span className="text-xs font-black text-slate-800 dark:text-slate-200 uppercase tracking-wider block">Critically Sold Out</span>
-          <p className="text-3xl md:text-4xl font-black text-red-600 dark:text-red-400">{outOfStockProducts.length}</p>
-          <span className="text-xs md:text-sm text-slate-700 dark:text-slate-300 font-semibold block">Needs vendor purchase order</span>
+        <div className="p-4 sm:p-5 rounded-2xl bg-white dark:bg-slate-900 border border-slate-300 dark:border-slate-800 shadow-sm space-y-1 transition-all min-w-0">
+          <span className="text-[11px] sm:text-xs font-black text-slate-700 dark:text-slate-300 uppercase tracking-wider block truncate">Critically Sold Out</span>
+          <p className="text-2xl sm:text-3xl lg:text-4xl font-black text-red-600 dark:text-red-400">{outOfStockProducts.length}</p>
+          <span className="text-xs text-slate-500 dark:text-slate-400 font-semibold block truncate">Needs vendor purchase order</span>
         </div>
       </div>
 
-      {/* Action Header */}
-      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
-        <div>
-          <h1 className="text-3xl md:text-4xl font-black tracking-tight text-slate-900 dark:text-white">Inventory Catalog</h1>
-          <p className="text-sm md:text-base font-semibold text-slate-700 dark:text-slate-300 mt-1">Manage retail pricing, supply cost, and live warehouse inventory.</p>
+      {/* Action Header - Responsive wrap so + Add Product is NEVER cut off */}
+      <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-3.5 sm:gap-4">
+        <div className="min-w-0">
+          <h1 className="text-2xl sm:text-3xl lg:text-4xl font-black tracking-tight text-slate-900 dark:text-white truncate">Inventory Catalog</h1>
+          <p className="text-xs sm:text-sm font-semibold text-slate-600 dark:text-slate-400 mt-0.5">Manage retail pricing, supply cost, and live warehouse inventory.</p>
         </div>
-        <div className="flex items-center gap-3 w-full sm:w-auto">
-          <label className="flex-1 sm:flex-none px-5 py-3 bg-white dark:bg-slate-800 border-2 border-slate-300 dark:border-slate-700 text-slate-900 dark:text-white hover:bg-slate-100 dark:hover:bg-slate-700 rounded-xl cursor-pointer flex items-center justify-center gap-2 text-sm md:text-base font-bold transition shadow-sm active:scale-95">
-            <Camera className="w-5 h-5 text-blue-600 dark:text-blue-400" />
-            <span>{uploading ? 'Parsing...' : 'Restock Via Bill Scan'}</span>
+        <div className="flex flex-wrap items-center gap-2.5 sm:gap-3 w-full md:w-auto shrink-0">
+          <label className="flex-1 sm:flex-none px-4 sm:px-5 py-2.5 sm:py-3 bg-white dark:bg-slate-800 border-2 border-slate-300 dark:border-slate-700 text-slate-900 dark:text-white hover:bg-slate-100 dark:hover:bg-slate-700 rounded-xl cursor-pointer flex items-center justify-center gap-2 text-xs sm:text-sm font-black transition shadow-sm active:scale-95 shrink-0">
+            <Camera className="w-4 h-4 sm:w-5 sm:h-5 text-blue-600 dark:text-blue-400 shrink-0" />
+            <span className="whitespace-nowrap">{uploading ? 'Parsing...' : 'Restock Via Bill Scan'}</span>
             <input type="file" accept="image/*" onChange={handleImageUpload} className="hidden" disabled={uploading} />
           </label>
           <button
@@ -280,31 +280,31 @@ const ProductsView = () => {
               resetForm()
               setShowModal(true)
             }}
-            className="flex-1 sm:flex-none px-6 py-3 bg-blue-600 hover:bg-blue-500 text-white rounded-xl flex items-center justify-center gap-2 text-sm md:text-base font-bold shadow-md shadow-blue-500/20 transition active:scale-95"
+            className="flex-1 sm:flex-none px-5 sm:px-6 py-2.5 sm:py-3 bg-blue-600 hover:bg-blue-500 text-white rounded-xl flex items-center justify-center gap-2 text-xs sm:text-sm font-black shadow-md shadow-blue-500/20 transition active:scale-95 shrink-0"
           >
-            <Plus className="w-5 h-5" />
-            <span>Add Product</span>
+            <Plus className="w-4 h-4 sm:w-5 sm:h-5 shrink-0" />
+            <span className="whitespace-nowrap">Add Product</span>
           </button>
         </div>
       </div>
 
       {/* Critical Stock Alert Banner */}
       {(outOfStockProducts.length > 0 || lowStockProducts.length > 0) && (
-        <div className="p-4 md:p-5 rounded-2xl border-2 border-amber-400 dark:border-amber-700/60 bg-amber-50 dark:bg-amber-950/30 shadow-sm flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
-          <div className="flex items-center gap-3.5">
-            <div className="p-2.5 rounded-xl bg-amber-500/20 text-amber-700 dark:text-amber-400 shrink-0">
-              <AlertTriangle className="w-6 h-6" />
+        <div className="p-4 sm:p-5 rounded-2xl border-2 border-amber-400 dark:border-amber-700/60 bg-amber-50 dark:bg-amber-950/30 shadow-sm flex flex-col lg:flex-row items-start lg:items-center justify-between gap-3 sm:gap-4">
+          <div className="flex items-center gap-3 min-w-0">
+            <div className="p-2 sm:p-2.5 rounded-xl bg-amber-500/20 text-amber-700 dark:text-amber-400 shrink-0">
+              <AlertTriangle className="w-5 h-5 sm:w-6 sm:h-6" />
             </div>
-            <div>
-              <h3 className="font-black text-sm uppercase tracking-wider text-amber-900 dark:text-amber-300">Inventory Alert</h3>
-              <p className="text-sm font-semibold text-amber-900 dark:text-amber-200 mt-0.5">
+            <div className="min-w-0">
+              <h3 className="font-black text-xs sm:text-sm uppercase tracking-wider text-amber-900 dark:text-amber-300">Inventory Alert</h3>
+              <p className="text-xs sm:text-sm font-semibold text-amber-900 dark:text-amber-200 mt-0.5">
                 {outOfStockProducts.length} item(s) are completely empty, and {lowStockProducts.length} item(s) are running critically low.
               </p>
             </div>
           </div>
-          <div className="flex items-center gap-2 text-xs md:text-sm font-semibold">
+          <div className="flex items-center gap-2 text-xs font-semibold shrink-0">
             <span className="text-amber-900 dark:text-amber-300 font-bold">Items:</span>
-            <span className="text-amber-900 dark:text-amber-200 truncate max-w-sm font-medium">
+            <span className="text-amber-900 dark:text-amber-200 truncate max-w-[200px] sm:max-w-xs font-medium">
               {[...outOfStockProducts, ...lowStockProducts].slice(0, 4).map(p => p.name).join(', ')}...
             </span>
           </div>
@@ -368,8 +368,8 @@ const ProductsView = () => {
         )}
       </div>
 
-      {/* Products Grid */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 xl:grid-cols-4 gap-5">
+      {/* Products Grid - 2 columns on iPad / tablets so cards never get clipped */}
+      <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4 gap-4 sm:gap-5">
         {filteredProducts.map((product) => {
           const isSelected = selectedProducts.includes(product.id)
           const stockNum = Number(product.quantity || 0)

@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useMemo } from 'react'
+import { createPortal } from 'react-dom'
 import { 
   Plus, 
   Trash2, 
@@ -397,21 +398,21 @@ const POSView = () => {
 
       <div className="flex flex-col lg:flex-row h-full overflow-hidden bg-slate-100 dark:bg-slate-950">
         {/* Catalog Section */}
-        <div className={`flex-1 p-5 lg:p-7 overflow-y-auto custom-scrollbar flex flex-col ${mobileTab !== 'products' && 'hidden lg:flex'}`}>
+        <div className={`flex-1 p-4 sm:p-5 lg:p-6 overflow-y-auto custom-scrollbar flex flex-col min-w-0 ${mobileTab !== 'products' && 'hidden lg:flex'}`}>
           {/* Top Search & OCR Scan Bar */}
-          <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3.5 mb-5">
-            <div className="relative flex-1">
-              <Search className="absolute left-4 top-4 text-slate-500 w-5 h-5" />
+          <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3 mb-4">
+            <div className="relative flex-1 min-w-0">
+              <Search className="absolute left-4 top-3.5 text-slate-500 w-5 h-5" />
               <input
                 type="text"
                 placeholder="Search products by title or barcode..."
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                className="w-full pl-12 pr-4 py-3.5 rounded-2xl border-2 border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-900 text-slate-900 dark:text-white placeholder-slate-500 focus:ring-2 focus:ring-blue-500/20 focus:border-blue-600 outline-none transition text-base font-semibold shadow-sm"
+                className="w-full pl-11 pr-4 py-3 rounded-2xl border-2 border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-900 text-slate-900 dark:text-white placeholder-slate-500 focus:ring-2 focus:ring-blue-500/20 focus:border-blue-600 outline-none transition text-sm sm:text-base font-semibold shadow-sm"
               />
             </div>
 
-            <label className="px-6 py-3.5 bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-500 hover:to-indigo-500 text-white rounded-2xl cursor-pointer flex items-center justify-center gap-2.5 transition-all shadow-md shadow-blue-500/25 shrink-0 font-bold text-base active:scale-95">
+            <label className="px-5 py-3 bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-500 hover:to-indigo-500 text-white rounded-2xl cursor-pointer flex items-center justify-center gap-2 transition-all shadow-md shadow-blue-500/25 shrink-0 font-black text-sm sm:text-base active:scale-95">
               <Camera className="w-5 h-5" />
               <span>{uploading ? 'Analyzing...' : 'AI Bill Scan'}</span>
               <input type="file" accept="image/*" onChange={handleImageUpload} className="hidden" disabled={uploading} />
@@ -426,7 +427,7 @@ const POSView = () => {
                 <button
                   key={cat}
                   onClick={() => setSelectedCategory(cat)}
-                  className={`px-4 py-2.5 rounded-xl text-xs md:text-sm font-bold whitespace-nowrap transition-all duration-150 ${
+                  className={`px-3.5 py-2 rounded-xl text-xs sm:text-sm font-bold whitespace-nowrap transition-all duration-150 ${
                     isSelected
                       ? 'bg-blue-600 text-white shadow-md shadow-blue-500/25'
                       : 'bg-slate-100 dark:bg-slate-900 border border-slate-300 dark:border-slate-800 text-slate-800 dark:text-slate-200 hover:text-blue-600 dark:hover:text-white hover:border-slate-400'
@@ -438,8 +439,8 @@ const POSView = () => {
             })}
           </div>
 
-          {/* Products Grid */}
-          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 xl:grid-cols-4 gap-4 pb-24 lg:pb-6">
+          {/* Products Grid - 2 columns on iPad/Tablets so cards have generous breathing room! */}
+          <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4 gap-3.5 sm:gap-4 pb-24 lg:pb-6">
             {filteredProducts.map((product) => {
               const stockNum = Number(product.quantity || 0)
               const isOutOfStock = stockNum <= 0
@@ -447,14 +448,14 @@ const POSView = () => {
                 <button
                   key={product.id}
                   onClick={() => addToCart(product)}
-                  className="p-5 bg-white dark:bg-slate-900 border-2 border-slate-300 dark:border-slate-800 rounded-2xl hover:border-blue-600 transition-all duration-200 text-left shadow-md hover:shadow-lg group flex flex-col justify-between relative overflow-hidden"
+                  className="p-4 sm:p-5 bg-white dark:bg-slate-900 border-2 border-slate-300 dark:border-slate-800 rounded-2xl hover:border-blue-600 transition-all duration-200 text-left shadow-sm hover:shadow-lg group flex flex-col justify-between relative overflow-hidden"
                 >
                   <div>
-                    <div className="flex justify-between items-start mb-2.5">
-                      <span className="text-xs font-bold uppercase tracking-wider text-slate-800 dark:text-slate-200 bg-slate-100 dark:bg-slate-800 border border-slate-300 dark:border-slate-700 px-3 py-1 rounded-md truncate max-w-[130px]">
+                    <div className="flex justify-between items-start gap-2 mb-2">
+                      <span className="text-[11px] font-bold uppercase tracking-wider text-slate-700 dark:text-slate-300 bg-slate-100 dark:bg-slate-800 border border-slate-300 dark:border-slate-700 px-2.5 py-0.5 rounded-md truncate max-w-[100px] sm:max-w-[130px]">
                         {product.category || 'General'}
                       </span>
-                      <span className={`px-3 py-1 rounded-full text-xs font-extrabold ${
+                      <span className={`px-2.5 py-0.5 rounded-full text-[11px] font-black shrink-0 ${
                         isOutOfStock 
                           ? 'bg-red-500/15 text-red-700 dark:text-red-400 border border-red-500/30' 
                           : stockNum < 5 
@@ -464,17 +465,17 @@ const POSView = () => {
                         {isOutOfStock ? 'Empty' : `${stockNum} left`}
                       </span>
                     </div>
-                    <h3 className="font-black text-base md:text-lg text-slate-900 dark:text-white group-hover:text-blue-600 transition-colors line-clamp-2">
+                    <h3 className="font-black text-sm sm:text-base text-slate-900 dark:text-white group-hover:text-blue-600 transition-colors line-clamp-2 break-words">
                       {product.name}
                     </h3>
                   </div>
 
-                  <div className="flex items-center justify-between mt-4 pt-3.5 border-t border-slate-200 dark:border-slate-800">
-                    <p className="text-xl md:text-2xl font-black text-blue-600 dark:text-blue-400">
+                  <div className="flex items-center justify-between mt-3.5 pt-3 border-t border-slate-200 dark:border-slate-800 gap-2">
+                    <p className="text-lg sm:text-xl font-black text-blue-600 dark:text-blue-400 whitespace-nowrap shrink-0">
                       ₹{Number(product.price || 0).toFixed(2)}
                     </p>
-                    <div className="w-9 h-9 rounded-xl bg-blue-50 dark:bg-blue-900/40 text-blue-600 dark:text-blue-400 flex items-center justify-center group-hover:bg-blue-600 group-hover:text-white transition-all shadow-sm">
-                      <Plus className="w-5 h-5" />
+                    <div className="w-8 h-8 rounded-xl bg-blue-50 dark:bg-blue-900/40 text-blue-600 dark:text-blue-400 flex items-center justify-center group-hover:bg-blue-600 group-hover:text-white transition-all shadow-sm shrink-0">
+                      <Plus className="w-4 h-4" />
                     </div>
                   </div>
                 </button>
@@ -483,8 +484,8 @@ const POSView = () => {
           </div>
         </div>
 
-        {/* Enhanced Modern Cart Panel */}
-        <div className={`w-full lg:w-[420px] bg-white dark:bg-slate-900 border-l-2 border-slate-300 dark:border-slate-800 p-5 lg:p-6 flex flex-col h-full shadow-2xl shrink-0 ${mobileTab !== 'cart' && 'hidden lg:flex'}`}>
+        {/* Enhanced Modern Cart Panel - Scaled for iPad / Tablet */}
+        <div className={`w-full lg:w-[340px] xl:w-[380px] 2xl:w-[420px] bg-white dark:bg-slate-900 border-l-2 border-slate-300 dark:border-slate-800 p-4 sm:p-5 lg:p-6 flex flex-col h-full shadow-2xl shrink-0 min-w-0 ${mobileTab !== 'cart' && 'hidden lg:flex'}`}>
           {/* Cart Header */}
           <div className="flex items-center justify-between pb-4 border-b border-slate-200 dark:border-slate-800">
             <div className="flex items-center gap-2.5">
@@ -644,8 +645,8 @@ const POSView = () => {
       </div>
 
       {/* --- CHECKOUT MODAL --- */}
-      {showCheckoutModal && (
-        <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black/60 backdrop-blur-md animate-fade-in">
+      {showCheckoutModal && createPortal(
+        <div className="fixed inset-0 z-[99999] flex items-center justify-center p-3 sm:p-5 bg-black/75 backdrop-blur-sm animate-fade-in">
           <div className="bg-white dark:bg-slate-900 w-full max-w-4xl rounded-3xl shadow-2xl border border-slate-200 dark:border-slate-800 flex flex-col max-h-[92vh] overflow-hidden">
             <div className="flex justify-between items-center px-6 py-4 border-b border-slate-200 dark:border-slate-800">
               <div className="flex items-center gap-2.5">
@@ -763,7 +764,8 @@ const POSView = () => {
               </div>
             </div>
           </div>
-        </div>
+        </div>,
+        document.body
       )}
 
       {/* Dedicated Thermal Bill Print Modal */}

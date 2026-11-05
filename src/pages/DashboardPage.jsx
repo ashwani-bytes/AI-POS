@@ -8,7 +8,7 @@ import ReportsView from '../components/ReportsView'
 import SettingsView from '../components/SettingsView'
 import { onAuthStateChanged, signOut, getAuthInstance, initFirebase, isFirebaseConfigured } from '../lib/firebase'
 import { api } from '../lib/api'
-import { Store, Sun, Moon, LogOut } from 'lucide-react'
+import { Store, Sun, Moon, LogOut, PanelLeftClose, PanelLeftOpen } from 'lucide-react'
 
 const DashboardPage = ({ onLogout }) => {
   const { t, isDarkMode, toggleTheme, setTheme } = useTheme()
@@ -16,6 +16,12 @@ const DashboardPage = ({ onLogout }) => {
   const [user, setUser] = useState(null)
   const [generalSettings, setGeneralSettings] = useState(null)
   const [isSidebarOpen, setIsSidebarOpen] = useState(false)
+  const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(() => {
+    if (typeof window !== 'undefined') {
+      return window.innerWidth < 1200
+    }
+    return false
+  })
 
   // Firebase auth state listener
   useEffect(() => {
@@ -69,19 +75,32 @@ const DashboardPage = ({ onLogout }) => {
           }} 
           onLogout={onLogout}
           onClose={() => setIsSidebarOpen(false)}
+          isCollapsed={isSidebarCollapsed}
+          onToggleCollapse={() => setIsSidebarCollapsed(prev => !prev)}
         />
       </div>
 
       <div className="flex-1 flex flex-col min-w-0 overflow-hidden h-screen bg-slate-100 dark:bg-slate-950">
         {/* Modern Elevated Header */}
         <header className="w-full flex items-center justify-between px-5 md:px-7 py-4 border-b border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 z-10 shrink-0 shadow-sm">
-          <div className="flex items-center gap-4">
+          <div className="flex items-center gap-3">
+            {/* Mobile Hamburger */}
             <button 
               className="lg:hidden p-2.5 -ml-2 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-xl transition text-slate-600 dark:text-slate-400"
               onClick={() => setIsSidebarOpen(true)}
               aria-label="Open sidebar"
             >
               <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><line x1="4" x2="20" y1="12" y2="12"></line><line x1="4" x2="20" y1="6" y2="6"></line><line x1="4" x2="20" y1="18" y2="18"></line></svg>
+            </button>
+
+            {/* Desktop / iPad Sidebar Slim Toggle */}
+            <button
+              type="button"
+              onClick={() => setIsSidebarCollapsed(!isSidebarCollapsed)}
+              className="hidden lg:flex p-2 rounded-xl hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-600 dark:text-slate-400 transition"
+              title={isSidebarCollapsed ? 'Expand Sidebar' : 'Collapse Sidebar to Slim Mode'}
+            >
+              {isSidebarCollapsed ? <PanelLeftOpen className="w-5 h-5 text-blue-600 dark:text-blue-400" /> : <PanelLeftClose className="w-5 h-5" />}
             </button>
 
             {/* Store Avatar & Info */}

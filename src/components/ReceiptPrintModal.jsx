@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useMemo } from 'react'
+import { createPortal } from 'react-dom'
 import { 
   Printer, 
   X, 
@@ -102,8 +103,8 @@ const ReceiptPrintModal = ({
 
   if (!isOpen || !transaction) return null
 
-  return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-5 bg-black/75 backdrop-blur-sm animate-fade-in">
+  const modalJSX = (
+    <div className="fixed inset-0 z-[99999] flex items-center justify-center p-3 sm:p-5 bg-black/75 backdrop-blur-sm animate-fade-in">
       {/* Hidden container dedicated for window.print() */}
       <div id="pos-print-area" className={paperSize === '58mm' ? 'paper-58mm' : 'paper-80mm'} aria-hidden="true">
         <ThermalReceipt 
@@ -389,6 +390,8 @@ const ReceiptPrintModal = ({
       </div>
     </div>
   )
+
+  return createPortal(modalJSX, document.body)
 }
 
 export default ReceiptPrintModal
