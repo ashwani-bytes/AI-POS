@@ -4,6 +4,7 @@ import { useTheme } from '../context/ThemeContext'
 import LoadingBar from './LoadingBar'
 import Toast from './Toast'
 import { api } from '../lib/api'
+import { compressImage } from '../lib/image'
 
 const CATEGORIES = [
   'All',
@@ -185,15 +186,16 @@ const ProductsView = () => {
   }
 
   const handleImageUpload = async (e) => {
-    const file = e.target.files?.[0]
-    if (!file) return
+    const rawFile = e.target.files?.[0]
+    if (!rawFile) return
 
     setUploading(true)
-    const formData = new FormData()
-    formData.append('mode', 'restock')
-    formData.append('image', file)
-
     try {
+      const file = await compressImage(rawFile)
+      const formData = new FormData()
+      formData.append('mode', 'restock')
+      formData.append('image', file)
+
       const response = await api.postFormData('/api/upload', formData)
       const data = await response.json().catch(() => ({}))
       

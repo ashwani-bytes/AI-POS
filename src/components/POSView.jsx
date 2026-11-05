@@ -18,6 +18,7 @@ import { useTheme } from '../context/ThemeContext'
 import LoadingBar from './LoadingBar'
 import Toast from './Toast'
 import { api } from '../lib/api'
+import { compressImage } from '../lib/image'
 
 function calculateTotalsManual(cartData, discount, taxRate) {
   const s = cartData.reduce((sum, item) => sum + ((Number(item.price) || 0) * (Number(item.quantity) || 1)), 0)
@@ -152,6 +153,13 @@ const POSView = () => {
     }
   }
 
+  function updateItemPrice(cartItemId, newPrice) {
+    const parsed = newPrice === '' ? 0 : parseFloat(newPrice)
+    setCart(cart.map(item =>
+      item.cartItemId === cartItemId ? { ...item, price: isNaN(parsed) ? 0 : Math.max(0, parsed) } : item
+    ))
+  }
+
   function removeFromCart(cartItemId) {
     setCart(cart.filter(item => item.cartItemId !== cartItemId))
   }
@@ -174,15 +182,18 @@ const POSView = () => {
   }
 
   async function handleImageUpload(e) {
-    const file = e.target.files?.[0]
-    if (!file) return
+    const rawFile = e.target.files?.[0]
+    if (!rawFile) return
 
     setUploading(true)
-    const formData = new FormData()
-    formData.append('mode', 'sale')
-    formData.append('image', file)
-
     try {
+      // 1) Fast client-side image compression: reduces 10MB to ~400KB in 50ms
+      const file = await compressImage(rawFile)
+
+      const formData = new FormData()
+      formData.append('mode', 'sale')
+      formData.append('image', file)
+
       const response = await api.postFormData('/api/upload', formData)
       const data = await response.json().catch(() => ({}))
       if (!response.ok) {
@@ -196,13 +207,34 @@ const POSView = () => {
       }
 
       if (data.items && data.items.length > 0) {
-        const newItems = data.items.map(item => ({
-          cartItemId: `${Date.now()}_${Math.random()}`,
-          productId: item.productId || null,
-          name: item.name || 'Scanned Item',
-          price: Number(item.price) || 0,
-          quantity: Number(item.quantity) || 1
-        }))
+        const cleanStr = (s) => String(s || '').toLowerCase().replace(/[^a-z0-9]/g, '')
+
+        const newItems = data.items.map(item => {
+          let resolvedPrice = Number(item.price) || 0
+          const itemClean = cleanStr(item.name)
+
+          // Auto-resolve against loaded store catalog if scanned price is 0 or unassigned
+          const catalogProd = products.find(p => {
+            if (item.productId && p.id === item.productId) return true
+            const prodClean = cleanStr(p.name)
+            return prodClean === itemClean || (itemClean.length > 3 && prodClean.includes(itemClean)) || (prodClean.length > 3 && itemClean.includes(prodClean))
+          })
+
+          if (catalogProd) {
+            if (resolvedPrice <= 0 && Number(catalogProd.price) > 0) {
+              resolvedPrice = Number(catalogProd.price)
+            }
+          }
+
+          return {
+            cartItemId: `${Date.now()}_${Math.random()}`,
+            productId: item.productId || catalogProd?.id || null,
+            name: catalogProd?.name || item.name || 'Scanned Item',
+            price: resolvedPrice,
+            quantity: Number(item.quantity) || 1
+          }
+        })
+
         setCart(prev => [...prev, ...newItems])
         showToast('success', `Added ${data.items.length} items from scanned bill!`)
       } else if (!data.warning) {
@@ -219,6 +251,11 @@ const POSView = () => {
   async function handleCheckout() {
     if (cart.length === 0) {
       showToast('warning', 'Cart is empty')
+      return
+    }
+    const zeroPriceItems = cart.filter(i => (Number(i.price) || 0) <= 0)
+    if (zeroPriceItems.length > 0) {
+      showToast('warning', `Please enter a rate for: ${zeroPriceItems.map(i => i.name).slice(0, 2).join(', ')}${zeroPriceItems.length > 2 ? '...' : ''}`)
       return
     }
     await fetchGeneralSettings()
@@ -412,26 +449,76 @@ const POSView = () => {
                 <p className="text-sm text-slate-600 dark:text-slate-400 mt-1">Tap products or scan a bill to start checkout.</p>
               </div>
             ) : (
-              cart.map((item) => (
-                <div key={item.cartItemId} className="p-4 bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700 rounded-2xl space-y-2.5 transition-all">
-                  <div className="flex justify-between items-start gap-2.5">
-                    <span className="font-black text-base leading-snug line-clamp-1 text-slate-900 dark:text-white">{item.name}</span>
-                    <button onClick={() => removeFromCart(item.cartItemId)} className="text-slate-500 hover:text-red-500 transition shrink-0 p-1">
-                      <Trash2 className="w-4 h-4" />
-                    </button>
-                  </div>
-                  <div className="flex items-center justify-between">
-                    <div className="flex items-center bg-white dark:bg-slate-900 border-2 border-slate-300 dark:border-slate-700 rounded-xl shadow-sm">
-                      <button onClick={() => updateQuantity(item.cartItemId, item.quantity - 1)} className="w-8 h-8 flex items-center justify-center text-slate-800 dark:text-slate-200 hover:text-blue-600 font-black text-base">-</button>
-                      <span className="px-3 text-sm font-black text-slate-900 dark:text-white">{item.quantity}</span>
-                      <button onClick={() => updateQuantity(item.cartItemId, item.quantity + 1)} className="w-8 h-8 flex items-center justify-center text-slate-800 dark:text-slate-200 hover:text-blue-600 font-black text-base">+</button>
+              cart.map((item) => {
+                const isZeroPrice = (Number(item.price) || 0) <= 0
+                return (
+                  <div 
+                    key={item.cartItemId} 
+                    className={`p-4 rounded-2xl space-y-2.5 transition-all border ${
+                      isZeroPrice 
+                        ? 'bg-red-50/80 dark:bg-red-950/30 border-red-300 dark:border-red-800 ring-1 ring-red-400' 
+                        : 'bg-slate-50 dark:bg-slate-800/50 border-slate-200 dark:border-slate-700'
+                    }`}
+                  >
+                    <div className="flex justify-between items-start gap-2.5">
+                      <div className="flex-1 min-w-0">
+                        <span className="font-black text-base leading-snug truncate block text-slate-900 dark:text-white">
+                          {item.name}
+                        </span>
+                        {isZeroPrice && (
+                          <span className="inline-block mt-1 px-2 py-0.5 rounded text-[11px] font-black bg-red-100 dark:bg-red-900/60 text-red-700 dark:text-red-300">
+                            ⚠️ Enter Price / Rate
+                          </span>
+                        )}
+                      </div>
+                      <button onClick={() => removeFromCart(item.cartItemId)} className="text-slate-500 hover:text-red-500 transition shrink-0 p-1">
+                        <Trash2 className="w-4 h-4" />
+                      </button>
                     </div>
-                    <span className="font-black text-base text-slate-900 dark:text-white">
-                      ₹{(Number(item.price || 0) * Number(item.quantity || 1)).toFixed(2)}
-                    </span>
+
+                    <div className="flex items-center justify-between gap-2 pt-1">
+                      <div className="flex items-center bg-white dark:bg-slate-900 border-2 border-slate-300 dark:border-slate-700 rounded-xl shadow-sm">
+                        <button 
+                          onClick={() => updateQuantity(item.cartItemId, item.quantity - 1)} 
+                          className="w-8 h-8 flex items-center justify-center text-slate-800 dark:text-slate-200 hover:text-blue-600 font-black text-base transition"
+                        >
+                          -
+                        </button>
+                        <span className="px-3 text-sm font-black text-slate-900 dark:text-white">{item.quantity}</span>
+                        <button 
+                          onClick={() => updateQuantity(item.cartItemId, item.quantity + 1)} 
+                          className="w-8 h-8 flex items-center justify-center text-slate-800 dark:text-slate-200 hover:text-blue-600 font-black text-base transition"
+                        >
+                          +
+                        </button>
+                      </div>
+
+                      <div className="flex flex-col items-end">
+                        <span className="font-black text-base text-slate-900 dark:text-white">
+                          ₹{(Number(item.price || 0) * Number(item.quantity || 1)).toFixed(2)}
+                        </span>
+                        <div className="flex items-center gap-1 mt-0.5">
+                          <span className="text-xs font-bold text-slate-500 dark:text-slate-400">@ ₹</span>
+                          <input
+                            type="number"
+                            step="any"
+                            min="0"
+                            placeholder="0.00"
+                            value={item.price === 0 ? '' : item.price}
+                            onChange={(e) => updateItemPrice(item.cartItemId, e.target.value)}
+                            className={`w-20 px-1.5 py-0.5 text-xs font-black rounded border transition text-right outline-none ${
+                              isZeroPrice
+                                ? 'bg-white dark:bg-slate-900 border-red-500 text-red-600 dark:text-red-400 placeholder:text-red-400 shadow-sm'
+                                : 'bg-transparent hover:bg-white dark:hover:bg-slate-900 border-transparent hover:border-slate-300 dark:hover:border-slate-600 text-slate-700 dark:text-slate-300 focus:bg-white dark:focus:bg-slate-900 focus:border-blue-500'
+                            }`}
+                            title="Unit price (editable)"
+                          />
+                        </div>
+                      </div>
+                    </div>
                   </div>
-                </div>
-              ))
+                )
+              })
             )}
           </div>
 

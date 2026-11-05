@@ -5,9 +5,17 @@ const path = require('path')
 // Priority list of models to try in case of deprecation/quota limit
 const CANDIDATE_MODELS = [
   'gemini-2.5-flash',
-  'gemini-flash-latest',
-  'gemini-2.0-flash'
+  'gemini-2.0-flash',
+  'gemini-1.5-flash-latest',
+  'gemini-flash-latest'
 ]
+
+function withTimeout(ms, promise) {
+  return Promise.race([
+    promise,
+    new Promise((_, reject) => setTimeout(() => reject(new Error(`OCR call timed out after ${ms}ms`)), ms))
+  ])
+}
 
 async function performGeminiOcr(imagePath) {
   try {
@@ -29,26 +37,22 @@ async function performGeminiOcr(imagePath) {
       }
     }
 
-    const prompt = `You are a highly capable OCR receipt and invoice parsing AI. Extract the items directly from this bill.
-It might be a formal tabular GST invoice, a Tally printout, or a handwritten receipt.
+    const prompt = `You are a high-speed receipt and invoice parser AI. Extract all individual item rows from this bill image.
+It may be a GST tax invoice, retail cash memo, wholesale challan, or handwritten receipt.
 
-For tabular invoices:
-- The "name" of the item is usually under "Particulars", "Description", or "Item Name".
-- The "quantity" is usually under "Qty", "PCS", "Pieces", or "Quantity".
-- The "price" is usually under "Rate", "Price", or "MRP".
+For each item row:
+1. "name": Full product name (e.g., "Bread crumb 1 kg", "Chilli Flakes 500gm").
+2. "quantity": Total units or quantity number (default to 1 if not specified).
+3. "price": Single unit retail/selling price or rate.
+   - If a "Rate", "Price", or "MRP" column is given, use that number.
+   - If only line "Amount" / "Total" is visible, compute: price = total amount / quantity.
+   - Extract numeric amounts only (e.g. 130, not "130.00 Rs").
 
-Crucially: Extract every single purchased item from the main table, skipping the GST/Header/Footer rows.
-
-Return ONLY a strictly valid JSON array of objects representing the items. Do NOT wrap it in markdown blockquotes. Return exactly just the raw JSON array string.
-Each object MUST have exactly these keys:
-- "name": String (the full name of the item)
-- "quantity": Number
-- "price": Number
-
-Example Output:
+Crucially: Return ONLY a valid JSON array of objects. No markdown backticks, no explanations.
+Example output:
 [
-  {"name": "BREAD CRUMB 1 KG", "quantity": 10, "price": 123.81},
-  {"name": "Lays (Classic Salted)", "quantity": 50, "price": 20}
+  {"name": "BREAD CRUMB 1 KG", "quantity": 10, "price": 130},
+  {"name": "CHILLI FLAKES 500GM", "quantity": 2, "price": 204.75}
 ]
 `
 
@@ -56,11 +60,12 @@ Example Output:
     let text = ''
     let chosenModel = ''
 
+    // Fast failover with 25s timeout per model to prevent multi-minute freezes
     for (const modelName of CANDIDATE_MODELS) {
       try {
-        console.log(`[Gemini] Attempting OCR with ${modelName}...`)
+        console.log(`[Gemini] Attempting fast OCR with ${modelName}...`)
         const model = genAI.getGenerativeModel({ model: modelName })
-        const result = await model.generateContent([prompt, imagePart])
+        const result = await withTimeout(25000, model.generateContent([prompt, imagePart]))
         text = result.response.text()
         chosenModel = modelName
         break // Succeeded!
@@ -112,7 +117,15 @@ Example Output:
       if (typeof rawPrice !== 'number') {
         rawPrice = parseFloat(String(rawPrice || 0).replace(/[^0-9.]/g, ''))
       }
-      if (isNaN(rawPrice) || rawPrice < 0) rawPrice = 0
+      if (isNaN(rawPrice) || rawPrice <= 0) {
+        // Fallback: check if model returned rate, amount or total
+        const fallbackAmt = parseFloat(String(it.amount || it.rate || it.total || 0).replace(/[^0-9.]/g, ''))
+        if (!isNaN(fallbackAmt) && fallbackAmt > 0) {
+          rawPrice = Number((fallbackAmt / rawQty).toFixed(2))
+        } else {
+          rawPrice = 0
+        }
+      }
 
       return {
         name: String(it.name || 'Unknown Item').trim(),

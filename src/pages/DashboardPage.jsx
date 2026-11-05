@@ -19,6 +19,9 @@ const DashboardPage = ({ onLogout }) => {
 
   // Firebase auth state listener
   useEffect(() => {
+    // Pre-warm backend API immediately in background on app load
+    api.get('/api/health').catch(() => {})
+
     if (isFirebaseConfigured()) {
       initFirebase()
       const unsub = onAuthStateChanged(getAuthInstance(), (u) => setUser(u))

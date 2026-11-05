@@ -75,24 +75,33 @@ router.post('/', upload.single('image'), async (req, res) => {
       prodQuery = prodQuery.where('ownerUid', '==', uid)
     }
     const userProductsSnap = await prodQuery.get()
-    const productLookup = {}
-    userProductsSnap.docs.forEach(d => {
-      const pData = d.data()
-      if (pData.name) {
-        productLookup[pData.name.trim().toLowerCase()] = { id: d.id, ...pData }
-      }
-    })
+    const cleanStr = (s) => String(s || '').toLowerCase().replace(/[^a-z0-9]/g, '')
+    const userProducts = userProductsSnap.docs.map(d => ({ id: d.id, ...d.data() }))
 
     for (const item of items) {
       try {
-        const matchName = String(item.name || '').trim().toLowerCase()
-        const matched = productLookup[matchName]
-        const cleanPrice = Number(item.price) || 0
+        const itemClean = cleanStr(item.name)
+        // Find exact or normalized match
+        const matched = userProducts.find(p => {
+          const prodClean = cleanStr(p.name)
+          return prodClean === itemClean || (itemClean.length > 3 && prodClean.includes(itemClean)) || (prodClean.length > 3 && itemClean.includes(prodClean))
+        })
+
+        let cleanPrice = Number(item.price) || 0
         const cleanQty = Number(item.quantity) || 1
 
         if (matched) {
-          // Exact match found in store! Attach the ID so POS Checkouts deduct real stock.
+          // Match found in catalog! Attach the ID and canonical store name
           item.productId = matched.id
+          item.name = matched.name
+
+          // CRITICAL: In POS sale mode OR if scanned price is 0, ALWAYS use the store's registered retail price!
+          if (cleanPrice <= 0 || mode === 'sale') {
+            if (Number(matched.price) > 0) {
+              cleanPrice = Number(matched.price)
+              item.price = cleanPrice
+            }
+          }
           
           if (mode === 'restock') {
             const currentQty = Number(matched.quantity) || 0
@@ -100,7 +109,7 @@ router.post('/', upload.single('image'), async (req, res) => {
               quantity: currentQty + cleanQty,
               updatedAt: new Date().toISOString(),
             })
-            console.log(`[Inventory] Updated stock for "${item.name}": +${cleanQty}`)
+            console.log(`[Inventory] Updated stock for "${matched.name}": +${cleanQty}`)
             productsAdded++
           }
         } else {
