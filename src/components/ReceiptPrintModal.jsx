@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react'
+import React, { useState, useEffect, useMemo } from 'react'
 import { 
   Printer, 
   X, 
@@ -10,9 +10,13 @@ import {
   Wifi, 
   Bluetooth, 
   Zap,
-  RotateCcw
+  RotateCcw,
+  Smartphone,
+  Tablet,
+  Laptop
 } from 'lucide-react'
 import ThermalReceipt from './ThermalReceipt'
+import { getDeviceInfo, connectBluetoothPrinter } from '../lib/thermalPrinter'
 
 const ReceiptPrintModal = ({ 
   isOpen, 
@@ -26,6 +30,21 @@ const ReceiptPrintModal = ({
   const [showGuide, setShowGuide] = useState(false)
   const [activeGuideTab, setActiveGuideTab] = useState('usb')
   const [hasPrinted, setHasPrinted] = useState(false)
+  const [pairingBluetooth, setPairingBluetooth] = useState(false)
+  const [bluetoothDeviceName, setBluetoothDeviceName] = useState('')
+
+  const deviceInfo = useMemo(() => getDeviceInfo(), [])
+
+  // Auto-switch guide tab to match the cashier's current device
+  useEffect(() => {
+    if (deviceInfo.isIPad || deviceInfo.isIOS) {
+      setActiveGuideTab('ipad')
+    } else if (deviceInfo.isMobile || deviceInfo.isTablet) {
+      setActiveGuideTab('mobile')
+    } else {
+      setActiveGuideTab('usb')
+    }
+  }, [deviceInfo])
 
   // Update paper size if settings change
   useEffect(() => {
@@ -37,10 +56,23 @@ const ReceiptPrintModal = ({
   // Trigger print
   const handlePrint = () => {
     setHasPrinted(true)
-    // Small timeout ensures the print DOM container is fully reflowed
     setTimeout(() => {
       window.print()
     }, 150)
+  }
+
+  // Handle direct Web Bluetooth pairing for mobile/laptop Chrome
+  const handlePairBluetooth = async () => {
+    setPairingBluetooth(true)
+    try {
+      const res = await connectBluetoothPrinter()
+      setBluetoothDeviceName(res.deviceName)
+      alert(`Connected successfully to ${res.deviceName}! You can now print bills.`)
+    } catch (err) {
+      console.warn('Bluetooth pairing:', err.message)
+    } finally {
+      setPairingBluetooth(false)
+    }
   }
 
   // Auto-print effect on mount if requested
@@ -86,16 +118,22 @@ const ReceiptPrintModal = ({
       <div className="bg-white dark:bg-slate-900 w-full max-w-4xl max-h-[92vh] rounded-3xl shadow-2xl border-2 border-slate-300 dark:border-slate-800 flex flex-col overflow-hidden text-slate-900 dark:text-white">
         
         {/* Header */}
-        <div className="p-5 md:p-6 border-b border-slate-200 dark:border-slate-800 flex items-center justify-between bg-slate-50 dark:bg-slate-950/60">
+        <div className="p-4 md:p-6 border-b border-slate-200 dark:border-slate-800 flex items-center justify-between bg-slate-50 dark:bg-slate-950/60">
           <div className="flex items-center gap-3">
             <div className="w-10 h-10 rounded-2xl bg-blue-600 text-white flex items-center justify-center shadow-md shadow-blue-500/20">
               <Printer className="w-5 h-5" />
             </div>
             <div>
-              <h2 className="text-lg md:text-xl font-black">Thermal Bill Printer</h2>
-              <p className="text-xs text-slate-500 dark:text-slate-400 font-bold">
-                Tax Invoice #{transaction.id ? String(transaction.id).slice(-8).toUpperCase() : 'RECEIPT'}
-              </p>
+              <h2 className="text-base md:text-xl font-black">Thermal Bill Printer</h2>
+              <div className="flex items-center gap-2 mt-0.5">
+                <span className="text-[11px] text-slate-500 dark:text-slate-400 font-bold">
+                  Invoice #{transaction.id ? String(transaction.id).slice(-8).toUpperCase() : 'RECEIPT'}
+                </span>
+                <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-black bg-blue-100 dark:bg-blue-950/80 text-blue-700 dark:text-blue-300">
+                  {deviceInfo.isIPad ? <Tablet className="w-3 h-3" /> : deviceInfo.isMobile ? <Smartphone className="w-3 h-3" /> : <Laptop className="w-3 h-3" />}
+                  <span>{deviceInfo.deviceType}</span>
+                </span>
+              </div>
             </div>
           </div>
 
@@ -106,7 +144,7 @@ const ReceiptPrintModal = ({
               title="How to connect thermal printer machine"
             >
               <HelpCircle className="w-4 h-4 text-blue-600" />
-              <span className="hidden sm:inline">Printer Setup Guide</span>
+              <span className="hidden sm:inline">Connect Printer</span>
             </button>
 
             <button 
@@ -119,7 +157,7 @@ const ReceiptPrintModal = ({
         </div>
 
         {/* Content Area */}
-        <div className="flex-1 overflow-y-auto p-5 md:p-8 custom-scrollbar grid grid-cols-1 lg:grid-cols-12 gap-6 md:gap-8 items-start">
+        <div className="flex-1 overflow-y-auto p-4 md:p-8 custom-scrollbar grid grid-cols-1 lg:grid-cols-12 gap-6 md:gap-8 items-start">
           
           {/* Left Column: Realistic Paper Receipt Preview */}
           <div className="lg:col-span-6 flex flex-col items-center">
@@ -154,7 +192,7 @@ const ReceiptPrintModal = ({
             </div>
 
             {/* Scrollable Receipt Preview Container */}
-            <div className="w-full max-h-[58vh] overflow-y-auto p-4 bg-slate-100 dark:bg-slate-950 rounded-2xl border-2 border-slate-300 dark:border-slate-800 flex justify-center custom-scrollbar shadow-inner">
+            <div className="w-full max-h-[55vh] overflow-y-auto p-4 bg-slate-100 dark:bg-slate-950 rounded-2xl border-2 border-slate-300 dark:border-slate-800 flex justify-center custom-scrollbar shadow-inner">
               <ThermalReceipt 
                 transaction={transaction} 
                 settings={settings} 
@@ -164,97 +202,97 @@ const ReceiptPrintModal = ({
             </div>
           </div>
 
-          {/* Right Column: Controls & Connection Instructions */}
+          {/* Right Column: Controls & Multi-Device Instructions */}
           <div className="lg:col-span-6 flex flex-col justify-between h-full space-y-6">
             
             {showGuide ? (
-              /* Inline Setup Guide Drawer */
-              <div className="p-5 rounded-2xl bg-slate-50 dark:bg-slate-800/80 border-2 border-blue-500/30 space-y-4">
+              /* Inline Multi-Device Setup Guide Drawer */
+              <div className="p-4 md:p-5 rounded-2xl bg-slate-50 dark:bg-slate-800/80 border-2 border-blue-500/30 space-y-3.5">
                 <div className="flex items-center justify-between">
-                  <h3 className="font-black text-sm md:text-base flex items-center gap-2 text-blue-600 dark:text-blue-400">
+                  <h3 className="font-black text-xs md:text-sm flex items-center gap-2 text-blue-600 dark:text-blue-400">
                     <Printer className="w-4 h-4" />
-                    <span>How to Connect Your Bill Printer</span>
+                    <span>Connecting Printer to {deviceInfo.deviceType}</span>
                   </h3>
                   <button 
                     onClick={() => setShowGuide(false)}
                     className="text-xs text-slate-500 hover:text-slate-800 dark:hover:text-white font-bold"
                   >
-                    Close Guide
+                    Close
                   </button>
                 </div>
 
-                {/* Tabs */}
-                <div className="flex gap-1.5 border-b border-slate-200 dark:border-slate-700 pb-2">
+                {/* Device-Specific Tabs */}
+                <div className="flex gap-1.5 border-b border-slate-200 dark:border-slate-700 pb-2 overflow-x-auto">
+                  <button
+                    onClick={() => setActiveGuideTab('mobile')}
+                    className={`px-2.5 py-1.5 rounded-lg text-xs font-black flex items-center gap-1 transition shrink-0 ${
+                      activeGuideTab === 'mobile' ? 'bg-blue-600 text-white' : 'text-slate-600 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-700'
+                    }`}
+                  >
+                    <Smartphone className="w-3.5 h-3.5" /> Mobile / Android
+                  </button>
+                  <button
+                    onClick={() => setActiveGuideTab('ipad')}
+                    className={`px-2.5 py-1.5 rounded-lg text-xs font-black flex items-center gap-1 transition shrink-0 ${
+                      activeGuideTab === 'ipad' ? 'bg-blue-600 text-white' : 'text-slate-600 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-700'
+                    }`}
+                  >
+                    <Tablet className="w-3.5 h-3.5" /> iPad / iPhone
+                  </button>
                   <button
                     onClick={() => setActiveGuideTab('usb')}
-                    className={`px-3 py-1.5 rounded-lg text-xs font-black flex items-center gap-1 transition ${
+                    className={`px-2.5 py-1.5 rounded-lg text-xs font-black flex items-center gap-1 transition shrink-0 ${
                       activeGuideTab === 'usb' ? 'bg-blue-600 text-white' : 'text-slate-600 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-700'
                     }`}
                   >
-                    <Usb className="w-3.5 h-3.5" /> USB
-                  </button>
-                  <button
-                    onClick={() => setActiveGuideTab('bluetooth')}
-                    className={`px-3 py-1.5 rounded-lg text-xs font-black flex items-center gap-1 transition ${
-                      activeGuideTab === 'bluetooth' ? 'bg-blue-600 text-white' : 'text-slate-600 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-700'
-                    }`}
-                  >
-                    <Bluetooth className="w-3.5 h-3.5" /> Bluetooth
-                  </button>
-                  <button
-                    onClick={() => setActiveGuideTab('wifi')}
-                    className={`px-3 py-1.5 rounded-lg text-xs font-black flex items-center gap-1 transition ${
-                      activeGuideTab === 'wifi' ? 'bg-blue-600 text-white' : 'text-slate-600 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-700'
-                    }`}
-                  >
-                    <Wifi className="w-3.5 h-3.5" /> LAN / Wi-Fi
+                    <Laptop className="w-3.5 h-3.5" /> Laptop / PC
                   </button>
                   <button
                     onClick={() => setActiveGuideTab('kiosk')}
-                    className={`px-3 py-1.5 rounded-lg text-xs font-black flex items-center gap-1 transition ${
+                    className={`px-2.5 py-1.5 rounded-lg text-xs font-black flex items-center gap-1 transition shrink-0 ${
                       activeGuideTab === 'kiosk' ? 'bg-purple-600 text-white' : 'text-slate-600 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-700'
                     }`}
                   >
-                    <Zap className="w-3.5 h-3.5" /> Instant Kiosk
+                    <Zap className="w-3.5 h-3.5" /> Silent Kiosk
                   </button>
                 </div>
 
                 {/* Tab Content */}
-                <div className="text-xs text-slate-700 dark:text-slate-300 space-y-2.5 leading-relaxed">
+                <div className="text-xs text-slate-700 dark:text-slate-300 space-y-2 leading-relaxed">
+                  {activeGuideTab === 'mobile' && (
+                    <div className="space-y-1.5 font-semibold">
+                      <p><b>1. Bluetooth Thermal Printers:</b> Turn on your portable printer. Open phone/tablet <b>Bluetooth Settings → Pair Device</b>. Enter PIN (<code className="bg-slate-200 dark:bg-slate-700 px-1 rounded">0000</code> or <code className="bg-slate-200 dark:bg-slate-700 px-1 rounded">1234</code>).</p>
+                      <p><b>2. USB OTG Cable:</b> You can plug any USB thermal printer directly into your Android phone/tablet using a USB-C OTG adapter.</p>
+                      <p><b>3. Direct Print:</b> Tap <b>Print Bill</b> below, choose your printer from the Android print dialog, and set Paper Size to Roll (58mm or 80mm).</p>
+                    </div>
+                  )}
+
+                  {activeGuideTab === 'ipad' && (
+                    <div className="space-y-1.5 font-semibold">
+                      <p><b>1. AirPrint Thermal Printers:</b> If your printer supports AirPrint / Wi-Fi (e.g. Epson TM-T88, Star Micronics), connect it to store Wi-Fi. Safari on iPad/iPhone will detect it automatically!</p>
+                      <p><b>2. Shared Network Printer:</b> If the printer is plugged into your billing PC via USB, enable <b>Share this printer</b> in Windows. Your iPad on the same Wi-Fi will see it immediately!</p>
+                      <p><b>3. Print:</b> Tap <b>Print Bill</b> &rarr; Select printer &rarr; Set Margins: None &rarr; Print.</p>
+                    </div>
+                  )}
+
                   {activeGuideTab === 'usb' && (
-                    <ol className="list-decimal list-inside space-y-1.5 font-semibold">
-                      <li>Plug your thermal printer into your PC or POS terminal using the USB cable.</li>
-                      <li>Turn on the printer and install the manufacturer driver (e.g. TVS, Epson, Everycom, POS-58, POS-80).</li>
-                      <li>In Windows <b>Printers & Scanners</b>, set it as Default or select it when printing.</li>
-                      <li>In Chrome/Edge print dialog, set <b>Margins: None</b> and uncheck <b>Headers and footers</b>.</li>
-                    </ol>
+                    <div className="space-y-1.5 font-semibold">
+                      <p><b>1. USB Plug & Play:</b> Connect your thermal printer via USB cable to your laptop or PC.</p>
+                      <p><b>2. Windows Driver:</b> In Windows <b>Printers & Scanners</b>, it will appear as <b>POS-80</b> or your brand name (TVS, Epson, NGX, POS-58).</p>
+                      <p><b>3. Print Settings:</b> In Chrome/Edge print dialog, set <b>Margins: None</b> and uncheck <b>Headers & footers</b>.</p>
+                    </div>
                   )}
-                  {activeGuideTab === 'bluetooth' && (
-                    <ol className="list-decimal list-inside space-y-1.5 font-semibold">
-                      <li>Power on your handheld 58mm/80mm Bluetooth printer.</li>
-                      <li>On your PC, phone, or tablet, open <b>Bluetooth Settings</b> & click <b>Add Device</b>.</li>
-                      <li>Pair with your printer (Default PIN is usually <code className="bg-slate-200 dark:bg-slate-700 px-1 rounded">0000</code> or <code className="bg-slate-200 dark:bg-slate-700 px-1 rounded">1234</code>).</li>
-                      <li>Once paired, it will appear as an available printer in the print dialog.</li>
-                    </ol>
-                  )}
-                  {activeGuideTab === 'wifi' && (
-                    <ol className="list-decimal list-inside space-y-1.5 font-semibold">
-                      <li>Connect the printer to your billing router via Ethernet LAN cable or Wi-Fi.</li>
-                      <li>In Windows, go to <b>Printers & Scanners &rarr; Add device manually &rarr; Add using TCP/IP address</b>.</li>
-                      <li>Enter your printer's IP address (e.g. <code className="bg-slate-200 dark:bg-slate-700 px-1 rounded">192.168.1.100</code>).</li>
-                      <li>All POS billing counters on the local network can now print to this machine!</li>
-                    </ol>
-                  )}
+
                   {activeGuideTab === 'kiosk' && (
                     <div className="space-y-1.5 font-semibold">
-                      <p className="text-purple-700 dark:text-purple-300 font-black">
-                        ⚡ Silent Instant Printing (0 clicks needed!)
+                      <p className="text-purple-600 dark:text-purple-400 font-black">
+                        ⚡ 0-Click Instant Printing (Auto-Cut)
                       </p>
-                      <p>You can run Google Chrome with silent printing so bills print instantly upon checkout with no dialog popup:</p>
+                      <p>Run Google Chrome with silent printing enabled:</p>
                       <div className="p-2 bg-slate-900 text-emerald-400 font-mono text-[11px] rounded-lg">
-                        chrome.exe --kiosk --kiosk-printing https://ai-pos-one.vercel.app
+                        chrome.exe --kiosk-printing https://ai-pos-one.vercel.app
                       </div>
-                      <p className="text-[11px] text-slate-500">Receipts will print out directly to the paper roll in 0.5s!</p>
+                      <p className="text-[11px] text-slate-500">Upon checkout or QR payment, the thermal machine automatically prints with zero dialogs!</p>
                     </div>
                   )}
                 </div>
@@ -262,7 +300,7 @@ const ReceiptPrintModal = ({
             ) : (
               /* Quick Print Overview */
               <div className="space-y-4">
-                <div className="p-5 rounded-2xl bg-emerald-50 dark:bg-emerald-950/30 border-2 border-emerald-300 dark:border-emerald-800 space-y-2">
+                <div className="p-4 md:p-5 rounded-2xl bg-emerald-50 dark:bg-emerald-950/30 border-2 border-emerald-300 dark:border-emerald-800 space-y-2">
                   <div className="flex items-center gap-2 text-emerald-700 dark:text-emerald-400 font-black text-sm">
                     <Check className="w-5 h-5" />
                     <span>Transaction Recorded Successfully</span>
@@ -272,16 +310,36 @@ const ReceiptPrintModal = ({
                   </p>
                 </div>
 
+                {/* Direct Bluetooth pairing button if available */}
+                {deviceInfo.supportsBluetooth && (
+                  <div className="p-3.5 rounded-2xl bg-blue-50 dark:bg-blue-950/40 border border-blue-200 dark:border-blue-800 flex items-center justify-between">
+                    <div className="flex items-center gap-2">
+                      <Bluetooth className="w-4 h-4 text-blue-600" />
+                      <span className="text-xs font-bold text-slate-800 dark:text-slate-200">
+                        {bluetoothDeviceName ? `Paired: ${bluetoothDeviceName}` : 'Wireless Bluetooth Printer'}
+                      </span>
+                    </div>
+                    <button
+                      type="button"
+                      onClick={handlePairBluetooth}
+                      disabled={pairingBluetooth}
+                      className="px-3 py-1 bg-blue-600 hover:bg-blue-500 text-white rounded-lg text-xs font-black transition active:scale-95 disabled:opacity-50"
+                    >
+                      {pairingBluetooth ? 'Pairing...' : bluetoothDeviceName ? 'Re-pair' : 'Pair Bluetooth'}
+                    </button>
+                  </div>
+                )}
+
                 {/* Best Practice Tip Box */}
                 <div className="p-4 rounded-2xl bg-slate-50 dark:bg-slate-800/60 border border-slate-200 dark:border-slate-700 space-y-1.5 text-xs">
                   <span className="font-black text-slate-900 dark:text-white uppercase tracking-wider block">
-                    Recommended Printer Settings:
+                    Recommended Printer Settings ({deviceInfo.deviceType}):
                   </span>
                   <ul className="space-y-1 text-slate-600 dark:text-slate-300 font-medium list-disc list-inside">
-                    <li>Destination: Select your <b>POS-58</b>, <b>POS-80</b>, or thermal printer model</li>
+                    <li>Printer: Select your <b>POS-58</b>, <b>POS-80</b>, or thermal model</li>
                     <li>Paper Size: <b>{paperSize === '58mm' ? '58mm (2-inch roll)' : '80mm (3-inch roll)'}</b></li>
                     <li>Margins: <b>None</b> (or Minimum)</li>
-                    <li>Options: Uncheck <b>Headers and footers</b></li>
+                    <li>Uncheck <b>Headers and footers</b></li>
                   </ul>
                 </div>
               </div>

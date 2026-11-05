@@ -191,30 +191,30 @@ const SettingsView = () => {
                 <div className="flex gap-2 border-b border-slate-200 dark:border-slate-800 pb-2 overflow-x-auto">
                   <button
                     type="button"
+                    onClick={() => setActiveGuideTab('mobile')}
+                    className={`px-3 py-1.5 rounded-lg text-xs font-black flex items-center gap-1.5 transition ${
+                      activeGuideTab === 'mobile' ? 'bg-emerald-600 text-white' : 'text-slate-600 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-800'
+                    }`}
+                  >
+                    <Bluetooth className="w-3.5 h-3.5" /> Mobile / Android Tablet
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setActiveGuideTab('ipad')}
+                    className={`px-3 py-1.5 rounded-lg text-xs font-black flex items-center gap-1.5 transition ${
+                      activeGuideTab === 'ipad' ? 'bg-emerald-600 text-white' : 'text-slate-600 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-800'
+                    }`}
+                  >
+                    <Wifi className="w-3.5 h-3.5" /> iPad / iPhone (iOS)
+                  </button>
+                  <button
+                    type="button"
                     onClick={() => setActiveGuideTab('usb')}
                     className={`px-3 py-1.5 rounded-lg text-xs font-black flex items-center gap-1.5 transition ${
                       activeGuideTab === 'usb' ? 'bg-emerald-600 text-white' : 'text-slate-600 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-800'
                     }`}
                   >
-                    <Usb className="w-3.5 h-3.5" /> USB Cable Printer
-                  </button>
-                  <button
-                    type="button"
-                    onClick={() => setActiveGuideTab('bluetooth')}
-                    className={`px-3 py-1.5 rounded-lg text-xs font-black flex items-center gap-1.5 transition ${
-                      activeGuideTab === 'bluetooth' ? 'bg-emerald-600 text-white' : 'text-slate-600 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-800'
-                    }`}
-                  >
-                    <Bluetooth className="w-3.5 h-3.5" /> Bluetooth Wireless
-                  </button>
-                  <button
-                    type="button"
-                    onClick={() => setActiveGuideTab('wifi')}
-                    className={`px-3 py-1.5 rounded-lg text-xs font-black flex items-center gap-1.5 transition ${
-                      activeGuideTab === 'wifi' ? 'bg-emerald-600 text-white' : 'text-slate-600 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-800'
-                    }`}
-                  >
-                    <Wifi className="w-3.5 h-3.5" /> LAN / Wi-Fi Network
+                    <Usb className="w-3.5 h-3.5" /> Laptop / PC (USB)
                   </button>
                   <button
                     type="button"
@@ -229,25 +229,25 @@ const SettingsView = () => {
 
                 {/* Tab Details */}
                 <div className="text-xs md:text-sm text-slate-700 dark:text-slate-300 leading-relaxed font-semibold">
+                  {activeGuideTab === 'mobile' && (
+                    <div className="space-y-2">
+                      <p><b>1. Bluetooth Thermal Printers:</b> Turn on your 58mm or 80mm wireless printer. Open phone/tablet <b>Bluetooth Settings &rarr; Pair Device</b>. Enter PIN (<code className="px-1 bg-slate-200 dark:bg-slate-800 rounded">0000</code> or <code className="px-1 bg-slate-200 dark:bg-slate-800 rounded">1234</code>).</p>
+                      <p><b>2. USB OTG Adapter Cable:</b> You can plug any USB thermal printer directly into your Android phone or tablet using a small USB-C to USB-A (OTG) adapter.</p>
+                      <p><b>3. Direct Print:</b> Tap <b>Test Print Bill</b> above &rarr; Select your paired printer from the Android print dialog &rarr; Set Roll size to 58mm or 80mm.</p>
+                    </div>
+                  )}
+                  {activeGuideTab === 'ipad' && (
+                    <div className="space-y-2">
+                      <p><b>1. AirPrint Thermal Printers:</b> If your printer supports AirPrint / Wi-Fi (e.g. Epson TM-T88, Star Micronics), connect it to store Wi-Fi. Safari on iPad/iPhone will detect it automatically without needing any driver!</p>
+                      <p><b>2. Shared Network Printer:</b> If the printer is plugged into your billing PC via USB, enable <b>Share this printer</b> in Windows. Any iPad on the same Wi-Fi will see it and print seamlessly.</p>
+                      <p><b>3. Print:</b> Tap <b>Print Bill</b> &rarr; Choose AirPrint printer &rarr; Set Margins: None &rarr; Print.</p>
+                    </div>
+                  )}
                   {activeGuideTab === 'usb' && (
                     <div className="space-y-2">
                       <p><b>1. Connect USB Cable:</b> Plug your thermal printer (e.g. TVS RP 3200, Epson TM-T82, Everycom, POS-58, POS-80) into your PC's USB port.</p>
                       <p><b>2. Install Windows Driver:</b> Insert the CD or download the manufacturer's driver. In Windows <b>Settings &rarr; Printers & Scanners</b>, your printer will show as "POS-80" or your model name.</p>
                       <p><b>3. Test Print:</b> Click <b>"Test Print Bill"</b> above. In the browser print dialog, select your thermal printer, set Margins to <b>None</b>, and uncheck <b>Headers and footers</b>.</p>
-                    </div>
-                  )}
-                  {activeGuideTab === 'bluetooth' && (
-                    <div className="space-y-2">
-                      <p><b>1. Turn On Bluetooth:</b> Turn on your portable 58mm/80mm battery thermal printer.</p>
-                      <p><b>2. Pair with Device:</b> On Windows/Mac/Android, open Bluetooth &rarr; Add Device &rarr; Select your printer. Enter PIN (usually <code className="px-1 bg-slate-200 dark:bg-slate-800 rounded">0000</code> or <code className="px-1 bg-slate-200 dark:bg-slate-800 rounded">1234</code>).</p>
-                      <p><b>3. Ready:</b> The printer will appear directly in the print dialog for instant printing.</p>
-                    </div>
-                  )}
-                  {activeGuideTab === 'wifi' && (
-                    <div className="space-y-2">
-                      <p><b>1. Connect to Router:</b> Connect your thermal printer to the store Wi-Fi or router via an Ethernet cable.</p>
-                      <p><b>2. Add Network Printer:</b> In Windows Printers & Scanners, click <b>Add Device &rarr; Add manually &rarr; Add using TCP/IP address</b>, and enter the printer's IP address (e.g. <code className="px-1 bg-slate-200 dark:bg-slate-800 rounded">192.168.1.100</code>).</p>
-                      <p><b>3. Multi-Counter Support:</b> All cashiers in the store can print to the same kitchen/billing printer machine simultaneously.</p>
                     </div>
                   )}
                   {activeGuideTab === 'kiosk' && (
@@ -257,7 +257,7 @@ const SettingsView = () => {
                       <div className="p-2.5 bg-slate-900 text-emerald-400 font-mono text-xs rounded-xl">
                         chrome.exe --kiosk --kiosk-printing https://ai-pos-one.vercel.app
                       </div>
-                      <p className="text-xs text-slate-500">Upon clicking "Proceed to Pay", your thermal receipt machine will physically cut the paper roll within 0.5s!</p>
+                      <p className="text-xs text-slate-500">Upon clicking "Proceed to Pay" or when QR payment arrives, your thermal receipt machine will physically cut the paper roll within 0.5s!</p>
                     </div>
                   )}
                 </div>

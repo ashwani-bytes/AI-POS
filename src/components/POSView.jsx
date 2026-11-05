@@ -21,6 +21,7 @@ import { api } from '../lib/api'
 import { compressImage } from '../lib/image'
 import ThermalReceipt from './ThermalReceipt'
 import ReceiptPrintModal from './ReceiptPrintModal'
+import { playPaymentSuccessSound } from '../lib/sound'
 
 function calculateTotalsManual(cartData, discount, taxRate) {
   const s = cartData.reduce((sum, item) => sum + ((Number(item.price) || 0) * (Number(item.quantity) || 1)), 0)
@@ -90,6 +91,50 @@ const POSView = () => {
       setTxnRef(`TXN${Date.now().toString().slice(-6)}`)
     }
   }, [showCheckoutModal])
+
+  // Live UPI Payment Auto-Detection: Polls every 1.5s for customer QR payment
+  useEffect(() => {
+    if (!showCheckoutModal || paymentMethod !== 'upi' || !txnRef || checkingOut) return
+
+    let isSubscribed = true
+    const pollInterval = setInterval(async () => {
+      try {
+        const res = await api.get(`/api/payments/status/${txnRef}`)
+        if (res.ok) {
+          const data = await res.json()
+          if (data?.status === 'confirmed' && isSubscribed) {
+            clearInterval(pollInterval)
+            playPaymentSuccessSound()
+            showToast('success', 'UPI Payment Confirmed! Printing bill...')
+            finalizeTransaction()
+          }
+        }
+      } catch (err) {
+        // Continue polling
+      }
+    }, 1500)
+
+    return () => {
+      isSubscribed = false
+      clearInterval(pollInterval)
+    }
+  }, [showCheckoutModal, paymentMethod, txnRef, checkingOut])
+
+  async function handleSimulateUpiPayment() {
+    const { total } = getTotals()
+    try {
+      await api.post('/api/payments/confirm', {
+        txnRef,
+        amount: total,
+        note: 'Cashier Confirmed UPI Payment'
+      })
+      playPaymentSuccessSound()
+      showToast('success', 'UPI Payment Confirmed! Printing bill...')
+      finalizeTransaction()
+    } catch (e) {
+      showToast('error', 'Failed to confirm payment')
+    }
+  }
 
   function showToast(type, message) {
     setToast({ type, message })
@@ -656,25 +701,42 @@ const POSView = () => {
                 </div>
 
                 {paymentMethod === 'upi' && (
-                  <div className="p-6 bg-slate-50 dark:bg-slate-950 rounded-2xl border-2 border-slate-300 dark:border-slate-800 flex flex-col items-center animate-fade-in space-y-3.5 shadow-sm">
+                  <div className="p-5 md:p-6 bg-slate-50 dark:bg-slate-950 rounded-2xl border-2 border-slate-300 dark:border-slate-800 flex flex-col items-center animate-fade-in space-y-3.5 shadow-sm">
+                    {/* Live Auto-Print Listening Banner */}
+                    <div className="flex items-center gap-2 px-3 py-1 rounded-full bg-emerald-100 dark:bg-emerald-950/60 text-emerald-800 dark:text-emerald-300 text-xs font-black">
+                      <span className="w-2.5 h-2.5 rounded-full bg-emerald-500 animate-ping"></span>
+                      <span>Listening for QR Payment... Auto-Print ON</span>
+                    </div>
+
                     <span className="text-xs font-black text-blue-700 dark:text-blue-400 uppercase tracking-widest">Pre-filled UPI QR (Scan to Pay)</span>
                     {generalSettings?.upiId ? (
-                      <div className="p-3.5 bg-white rounded-2xl shadow-md border-2 border-slate-300">
+                      <div className="p-3 bg-white rounded-2xl shadow-md border-2 border-slate-300">
                         <img 
                           src={`https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=${encodeURIComponent(
                             `upi://pay?pa=${generalSettings.upiId.trim()}&pn=${encodeURIComponent(generalSettings?.storeName || 'Store')}&am=${total.toFixed(2)}&cu=INR&tn=Bill ${txnRef}&tr=${txnRef}`
                           )}`} 
                           alt="QR Code"
-                          className="w-44 h-44"
+                          className="w-40 h-40"
                         />
                       </div>
                     ) : (
                       <p className="text-sm font-bold text-red-600">Configure your UPI ID in Store Settings to enable QR.</p>
                     )}
+
                     <div className="text-center">
                       <p className="font-black text-3xl text-blue-600 dark:text-blue-400">₹{total.toFixed(2)}</p>
                       <p className="text-xs font-bold text-slate-700 dark:text-slate-300 mt-0.5">Reference: {txnRef}</p>
                     </div>
+
+                    {/* Instant Cashier Trigger Button for Testing & Verification */}
+                    <button
+                      type="button"
+                      onClick={handleSimulateUpiPayment}
+                      disabled={checkingOut}
+                      className="w-full py-2.5 px-3 rounded-xl bg-emerald-600/15 hover:bg-emerald-600/25 border-2 border-emerald-500/40 text-emerald-800 dark:text-emerald-300 text-xs font-black flex items-center justify-center gap-1.5 transition active:scale-95"
+                    >
+                      <span>⚡ Cashier: Confirm QR Payment Received (Auto-Print)</span>
+                    </button>
                   </div>
                 )}
 

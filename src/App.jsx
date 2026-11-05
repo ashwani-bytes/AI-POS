@@ -3,6 +3,7 @@ import { ThemeProvider } from './context/ThemeContext'
 import LandingPage from './pages/LandingPage'
 import AuthPage from './pages/AuthPage'
 import DashboardPage from './pages/DashboardPage'
+import PublicInvoicePage from './pages/PublicInvoicePage'
 import { initFirebase, getAuthInstance, onAuthStateChanged, signOut, isFirebaseConfigured } from './lib/firebase'
 
 const App = () => {
@@ -69,6 +70,11 @@ const App = () => {
     localStorage.removeItem('token')
     setIsAuthenticated(false)
     setCurrentPage('landing')
+  }
+
+  // Check if viewing customer public e-bill link
+  if (typeof window !== 'undefined' && window.location.pathname.startsWith('/invoice')) {
+    return <PublicInvoicePage />
   }
 
   return (

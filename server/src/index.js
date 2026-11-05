@@ -20,6 +20,7 @@ const reportsRouter = require('./routes/reports')
 const streamRouter = require('./routes/stream')
 const authRouter = require('./routes/auth')
 const settingsRouter = require('./routes/settings')
+const paymentsRouter = require('./routes/payments')
 
 const app = express()
 
@@ -110,6 +111,7 @@ app.get('/api/health/debug', (req, res) => {
 
 // Auth session endpoints (unprotected)
 app.use('/api/auth', authRouter)
+app.use('/api/payments', paymentsRouter)
 
 // Protected APIs
 app.use('/api/products', auth, productsRouter)
