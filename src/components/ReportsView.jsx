@@ -11,10 +11,12 @@ import {
   ShieldCheck, 
   AlertTriangle,
   Receipt,
-  Layers
+  Layers,
+  Printer
 } from 'lucide-react'
 import { useTheme } from '../context/ThemeContext'
 import { api } from '../lib/api'
+import ReceiptPrintModal from './ReceiptPrintModal'
 
 const ReportsView = ({ active }) => {
   const { t } = useTheme()
@@ -29,6 +31,8 @@ const ReportsView = ({ active }) => {
   const [loading, setLoading] = useState(!data)
   const [refreshing, setRefreshing] = useState(false)
   const [lastUpdated, setLastUpdated] = useState(new Date())
+  const [selectedTxn, setSelectedTxn] = useState(null)
+  const [settings, setSettings] = useState(null)
 
   const fetchReports = useCallback(async (isManualRefresh = false) => {
     if (isManualRefresh) setRefreshing(true)
@@ -52,6 +56,10 @@ const ReportsView = ({ active }) => {
 
   useEffect(() => {
     fetchReports()
+    api.get('/api/settings')
+      .then(r => r.ok ? r.json() : null)
+      .then(s => s && setSettings(s))
+      .catch(() => {})
   }, [fetchReports])
 
   useEffect(() => {
@@ -393,9 +401,18 @@ const ReportsView = ({ active }) => {
                       {tx.items?.length || 0} item(s) • {new Date(tx.createdAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
                     </p>
                   </div>
-                  <span className="text-base md:text-lg font-black text-slate-900 dark:text-white">
-                    ₹{Number(tx.total || 0).toFixed(2)}
-                  </span>
+                  <div className="flex items-center gap-3">
+                    <span className="text-base md:text-lg font-black text-slate-900 dark:text-white">
+                      ₹{Number(tx.total || 0).toFixed(2)}
+                    </span>
+                    <button
+                      onClick={() => setSelectedTxn(tx)}
+                      className="p-2.5 rounded-xl bg-blue-50 dark:bg-blue-950/60 text-blue-600 dark:text-blue-400 hover:bg-blue-600 hover:text-white border border-blue-200 dark:border-blue-800 transition shadow-sm active:scale-95"
+                      title="Re-Print Thermal Bill"
+                    >
+                      <Printer className="w-4 h-4" />
+                    </button>
+                  </div>
                 </div>
               ))
             ) : (
@@ -404,6 +421,17 @@ const ReportsView = ({ active }) => {
           </div>
         </div>
       </div>
+
+      {/* Re-Print Thermal Bill Modal */}
+      {selectedTxn && (
+        <ReceiptPrintModal
+          isOpen={Boolean(selectedTxn)}
+          onClose={() => setSelectedTxn(null)}
+          transaction={selectedTxn}
+          settings={settings}
+          autoPrint={false}
+        />
+      )}
     </div>
   )
 }

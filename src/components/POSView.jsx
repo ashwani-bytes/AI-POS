@@ -19,6 +19,8 @@ import LoadingBar from './LoadingBar'
 import Toast from './Toast'
 import { api } from '../lib/api'
 import { compressImage } from '../lib/image'
+import ThermalReceipt from './ThermalReceipt'
+import ReceiptPrintModal from './ReceiptPrintModal'
 
 function calculateTotalsManual(cartData, discount, taxRate) {
   const s = cartData.reduce((sum, item) => sum + ((Number(item.price) || 0) * (Number(item.quantity) || 1)), 0)
@@ -80,6 +82,8 @@ const POSView = () => {
   const [toast, setToast] = useState({ type: 'info', message: '' })
   const [mobileTab, setMobileTab] = useState('products')
   const [txnRef, setTxnRef] = useState('')
+  const [showPrintModal, setShowPrintModal] = useState(false)
+  const [lastTransaction, setLastTransaction] = useState(null)
 
   useEffect(() => {
     if (showCheckoutModal) {
@@ -263,7 +267,7 @@ const POSView = () => {
   }
 
   async function finalizeTransaction() {
-    const { total, discountAmt } = getTotals()
+    const { total, discountAmt, subtotal, tax } = getTotals()
     setCheckingOut(true)
     try {
       const response = await api.post('/api/transactions', {
@@ -273,14 +277,28 @@ const POSView = () => {
         payments: [{ method: paymentMethod, amount: total }]
       })
       if (response.ok) {
-        showToast('success', 'Sale completed & receipt generated!')
-        setTimeout(() => {
-          window.print()
-          setCart([])
-          setDiscount(0)
-          setShowCheckoutModal(false)
-          fetchProducts()
-        }, 300)
+        const createdTxn = await response.json().catch(() => null)
+        const txnRecord = createdTxn || {
+          id: txnRef,
+          items: [...cart],
+          discount: discountAmt,
+          taxRate,
+          tax,
+          subtotal,
+          total,
+          payments: [{ method: paymentMethod, amount: total }],
+          paymentMethod,
+          createdAt: new Date().toISOString()
+        }
+
+        // Set last transaction and open thermal print modal
+        setLastTransaction(txnRecord)
+        setShowCheckoutModal(false)
+        setShowPrintModal(true)
+        setCart([])
+        setDiscount(0)
+        fetchProducts()
+        showToast('success', 'Sale completed & thermal bill generated!')
       } else {
         const errData = await response.json().catch(() => ({}))
         const errorMsg = errData?.error || `Checkout failed (HTTP ${response.status})`
@@ -598,47 +616,21 @@ const POSView = () => {
               {/* Thermal Invoice Visualizer */}
               <div className="bg-slate-100 dark:bg-slate-950 p-5 rounded-2xl flex flex-col items-center border-2 border-slate-300 dark:border-slate-800">
                 <span className="text-xs font-black text-slate-800 dark:text-slate-200 uppercase tracking-widest mb-3">Live Thermal Receipt Preview</span>
-                <div id="receipt-visualizer" className="bg-white p-6 shadow-md text-gray-900 w-full max-w-[340px] rounded-xl border-2 border-gray-300" style={{ fontFamily: 'monospace', fontSize: '14px' }}>
-                  <div className="text-center mb-5">
-                    <h3 className="text-lg font-black uppercase tracking-wider">{generalSettings?.storeName || 'AI POS STORE'}</h3>
-                    <p className="whitespace-pre-wrap text-xs text-gray-700 mt-1 font-semibold">{generalSettings?.storeAddress}</p>
-                    {generalSettings?.phone && <p className="text-xs text-gray-700 font-semibold">Tel: {generalSettings.phone}</p>}
-                    <div className="mt-2.5 border-y-2 border-gray-400 py-1.5 font-black text-xs">TAX INVOICE - {txnRef}</div>
-                  </div>
-
-                  <table className="w-full mb-4 text-xs">
-                    <thead className="border-b-2 border-gray-400">
-                      <tr>
-                        <th className="text-left py-1 font-black">ITEM</th>
-                        <th className="text-center font-black">QTY</th>
-                        <th className="text-right font-black">AMT</th>
-                      </tr>
-                    </thead>
-                    <tbody className="border-b-2 border-gray-400">
-                      {cart.map(item => (
-                        <tr key={item.cartItemId}>
-                          <td className="py-1 truncate max-w-[130px] font-bold">{item.name}</td>
-                          <td className="text-center font-black">{item.quantity}</td>
-                          <td className="text-right font-black">₹{(Number(item.price || 0) * Number(item.quantity || 1)).toFixed(2)}</td>
-                        </tr>
-                      ))}
-                    </tbody>
-                  </table>
-
-                  <div className="space-y-1.5 w-full max-w-[210px] ml-auto text-xs">
-                    <div className="flex justify-between font-medium"><span>Subtotal:</span><span className="font-bold">₹{subtotal.toFixed(2)}</span></div>
-                    {discountAmt > 0 && <div className="flex justify-between text-red-600 font-bold"><span>Discount:</span><span className="font-black">-₹{discountAmt.toFixed(2)}</span></div>}
-                    <div className="flex justify-between font-medium"><span>GST ({(taxRate * 100).toFixed(0)}%):</span><span className="font-bold">₹{tax.toFixed(2)}</span></div>
-                    <div className="flex justify-between font-black border-t-2 border-gray-400 pt-1.5 mt-1 text-sm">
-                      <span>TOTAL:</span>
-                      <span>₹{total.toFixed(2)}</span>
-                    </div>
-                  </div>
-
-                  <div className="text-center text-xs mt-6 pt-3 border-t-2 border-dashed border-gray-400 text-gray-700 font-bold">
-                    {generalSettings?.receiptFooter || 'Thank you for shopping with us!'}
-                  </div>
-                </div>
+                <ThermalReceipt
+                  transaction={{
+                    id: txnRef,
+                    items: cart,
+                    subtotal,
+                    discount: discountAmt,
+                    tax,
+                    taxRate,
+                    total,
+                    paymentMethod,
+                    createdAt: new Date().toISOString()
+                  }}
+                  settings={generalSettings}
+                  paperSize={generalSettings?.printerPaperSize || '80mm'}
+                />
               </div>
 
               {/* Payment Processing & Dynamic QR */}
@@ -711,6 +703,19 @@ const POSView = () => {
           </div>
         </div>
       )}
+
+      {/* Dedicated Thermal Bill Print Modal */}
+      <ReceiptPrintModal
+        isOpen={showPrintModal}
+        onClose={() => setShowPrintModal(false)}
+        transaction={lastTransaction}
+        settings={generalSettings}
+        autoPrint={generalSettings?.autoPrintOnCheckout !== false}
+        onNewSale={() => {
+          setShowPrintModal(false)
+          setLastTransaction(null)
+        }}
+      />
     </>
   )
 }
