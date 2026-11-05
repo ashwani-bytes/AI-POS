@@ -12,11 +12,13 @@ import {
   AlertTriangle,
   Receipt,
   Layers,
-  Printer
+  Printer,
+  FileSpreadsheet
 } from 'lucide-react'
 import { useTheme } from '../context/ThemeContext'
 import { api } from '../lib/api'
 import ReceiptPrintModal from './ReceiptPrintModal'
+import SpreadsheetView from './SpreadsheetView'
 
 const ReportsView = ({ active }) => {
   const { t } = useTheme()
@@ -33,6 +35,7 @@ const ReportsView = ({ active }) => {
   const [lastUpdated, setLastUpdated] = useState(new Date())
   const [selectedTxn, setSelectedTxn] = useState(null)
   const [settings, setSettings] = useState(null)
+  const [viewMode, setViewMode] = useState('overview') // 'overview' | 'spreadsheet'
 
   const fetchReports = useCallback(async (isManualRefresh = false) => {
     if (isManualRefresh) setRefreshing(true)
@@ -103,15 +106,66 @@ const ReportsView = ({ active }) => {
           <h1 className="text-3xl md:text-4xl font-black tracking-tight text-slate-900 dark:text-white">Store Analytics & Financials</h1>
         </div>
 
+        <div className="flex items-center gap-2.5">
+          <button
+            onClick={() => setViewMode(viewMode === 'spreadsheet' ? 'overview' : 'spreadsheet')}
+            className={`px-4 py-2.5 rounded-xl font-black text-xs md:text-sm flex items-center gap-2 shadow-sm transition active:scale-95 ${
+              viewMode === 'spreadsheet'
+                ? 'bg-blue-600 hover:bg-blue-500 text-white shadow-blue-500/25'
+                : 'bg-emerald-600 hover:bg-emerald-500 text-white shadow-emerald-600/25'
+            }`}
+          >
+            <FileSpreadsheet className="w-4 h-4" />
+            <span>{viewMode === 'spreadsheet' ? 'Analytics View' : 'Sales & Stock Spreadsheet'}</span>
+          </button>
+
+          <button
+            onClick={() => fetchReports(true)}
+            disabled={refreshing}
+            className="px-4 py-2.5 rounded-xl border-2 border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 hover:border-blue-600 text-slate-800 dark:text-white text-xs md:text-sm font-bold flex items-center gap-2 transition-all shadow-sm active:scale-95"
+          >
+            <RefreshCw className={`w-4 h-4 ${refreshing ? 'animate-spin text-blue-600' : ''}`} />
+            <span className="hidden sm:inline">{refreshing ? 'Refreshing...' : 'Refresh'}</span>
+          </button>
+        </div>
+      </div>
+
+      {/* Segmented Mode Switcher */}
+      <div className="flex items-center gap-2 p-1.5 bg-slate-200/70 dark:bg-slate-900 border border-slate-300 dark:border-slate-800 rounded-2xl w-fit">
         <button
-          onClick={() => fetchReports(true)}
-          disabled={refreshing}
-          className="self-start sm:self-auto px-5 py-3 rounded-xl border-2 border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 hover:border-blue-600 text-slate-800 dark:text-white text-xs md:text-sm font-bold flex items-center gap-2 transition-all shadow-sm active:scale-95"
+          onClick={() => setViewMode('overview')}
+          className={`px-4 py-2 rounded-xl text-xs md:text-sm font-black flex items-center gap-2 transition ${
+            viewMode === 'overview'
+              ? 'bg-white dark:bg-slate-800 text-blue-600 dark:text-blue-400 shadow-sm'
+              : 'text-slate-600 dark:text-slate-400 hover:text-black dark:hover:text-white'
+          }`}
         >
-          <RefreshCw className={`w-4 h-4 ${refreshing ? 'animate-spin text-blue-600' : ''}`} />
-          <span>{refreshing ? 'Refreshing...' : 'Refresh Intel'}</span>
+          <TrendingUp className="w-4 h-4" />
+          <span>Executive Overview</span>
+        </button>
+
+        <button
+          onClick={() => setViewMode('spreadsheet')}
+          className={`px-4 py-2 rounded-xl text-xs md:text-sm font-black flex items-center gap-2 transition ${
+            viewMode === 'spreadsheet'
+              ? 'bg-emerald-600 text-white shadow-md shadow-emerald-600/20'
+              : 'text-slate-600 dark:text-slate-400 hover:text-black dark:hover:text-white'
+          }`}
+        >
+          <FileSpreadsheet className="w-4 h-4" />
+          <span>Live Sales & Stock Spreadsheet</span>
+          <span className="px-1.5 py-0.5 rounded-full text-[10px] font-black bg-amber-400 text-black">
+            PIE CHARTS
+          </span>
         </button>
       </div>
+
+      {/* SPREADSHEET VIEW MODE */}
+      {viewMode === 'spreadsheet' ? (
+        <SpreadsheetView onBack={() => setViewMode('overview')} isEmbedded={true} />
+      ) : (
+        /* STANDARD OVERVIEW MODE */
+        <>
 
       {/* TODAY'S PERFORMANCE HIGHLIGHTS */}
       <div className="space-y-4">
@@ -421,6 +475,8 @@ const ReportsView = ({ active }) => {
           </div>
         </div>
       </div>
+      </>
+      )}
 
       {/* Re-Print Thermal Bill Modal */}
       {selectedTxn && (

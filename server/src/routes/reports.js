@@ -248,5 +248,221 @@ router.get('/top-products', async (req, res) => {
   }
 })
 
+// GET /api/reports/spreadsheet - Live Sales, Stock & Restock Ledger with Pie Chart Analytics
+router.get('/spreadsheet', async (req, res) => {
+  try {
+    const uid = req.user?.uid
+    const data = await computeSpreadsheetData(uid)
+    res.json(data)
+  } catch (error) {
+    console.error('Spreadsheet report error:', error)
+    res.status(500).json({ error: 'Failed to generate spreadsheet report', details: error.message })
+  }
+})
+
+async function computeSpreadsheetData(uid) {
+  let txQuery = db().collection('transactions').where('type', '==', 'sale')
+  let prodQuery = db().collection('products')
+
+  if (uid && uid !== 'dev' && uid !== 'anonymous' && uid !== 'demo-user') {
+    txQuery = txQuery.where('ownerUid', '==', uid)
+    prodQuery = prodQuery.where('ownerUid', '==', uid)
+  }
+
+  const [txSnapshot, prodSnapshot] = await Promise.all([
+    txQuery.limit(1000).get(),
+    prodQuery.limit(1000).get()
+  ])
+
+  const transactions = txSnapshot.docs.map(d => ({ id: d.id, ...d.data() }))
+  const products = prodSnapshot.docs.map(d => ({ id: d.id, ...d.data() }))
+
+  transactions.sort((a, b) => getTime(b.createdAt) - getTime(a.createdAt))
+
+  // 1. Group daily sales
+  const dailyGroups = {}
+  const categorySales = {}
+  let totalCash = 0
+  let totalUpi = 0
+  let grandSales = 0
+
+  transactions.forEach(tx => {
+    const rev = Number(tx.total) || 0
+    grandSales += rev
+    const txMs = getTime(tx.createdAt)
+    const d = new Date(txMs)
+    const dateKey = !isNaN(d.getTime()) ? d.toISOString().split('T')[0] : 'Unknown'
+    const displayDate = !isNaN(d.getTime()) 
+      ? d.toLocaleDateString('en-IN', { day: '2-digit', month: 'short', year: 'numeric' }) 
+      : 'Unknown'
+
+    if (!dailyGroups[dateKey]) {
+      dailyGroups[dateKey] = {
+        date: dateKey,
+        displayDate,
+        totalSales: 0,
+        billsCount: 0,
+        cashSales: 0,
+        upiSales: 0,
+        itemsCount: 0
+      }
+    }
+
+    dailyGroups[dateKey].totalSales += rev
+    dailyGroups[dateKey].billsCount += 1
+
+    const method = tx.payments?.[0]?.method || tx.paymentMethod || 'cash'
+    if (method === 'cash') {
+      dailyGroups[dateKey].cashSales += rev
+      totalCash += rev
+    } else {
+      dailyGroups[dateKey].upiSales += rev
+      totalUpi += rev
+    }
+
+    if (Array.isArray(tx.items)) {
+      tx.items.forEach(it => {
+        const qty = Number(it.quantity) || 1
+        dailyGroups[dateKey].itemsCount += qty
+
+        const matchedProd = products.find(p => p.id === it.productId || p.name === it.name)
+        const cat = matchedProd?.category || it.category || 'General'
+        categorySales[cat] = (categorySales[cat] || 0) + ((Number(it.price) || 0) * qty)
+      })
+    }
+  })
+
+  const dailySales = Object.values(dailyGroups)
+    .sort((a, b) => b.date.localeCompare(a.date))
+    .map(d => ({
+      ...d,
+      totalSales: Math.round(d.totalSales * 100) / 100,
+      cashSales: Math.round(d.cashSales * 100) / 100,
+      upiSales: Math.round(d.upiSales * 100) / 100,
+      avgBillValue: d.billsCount > 0 ? Math.round((d.totalSales / d.billsCount) * 100) / 100 : 0
+    }))
+
+  // 2. Format detailed itemized transactions
+  const allTransactions = transactions.map(tx => {
+    const txMs = getTime(tx.createdAt)
+    const d = new Date(txMs)
+    const formattedDate = !isNaN(d.getTime())
+      ? d.toLocaleDateString('en-IN', { day: '2-digit', month: 'short', year: 'numeric' }) + ' ' + d.toLocaleTimeString('en-IN', { hour: '2-digit', minute: '2-digit' })
+      : 'N/A'
+
+    const itemsSummary = Array.isArray(tx.items)
+      ? tx.items.map(i => `${i.name || 'Item'} (x${i.quantity || 1})`).join(', ')
+      : 'N/A'
+
+    return {
+      id: tx.id,
+      date: tx.createdAt,
+      formattedDate,
+      itemCount: tx.items?.length || 0,
+      itemsSummary,
+      subtotal: Number(tx.subtotal) || Number(tx.total) || 0,
+      discount: Number(tx.discount) || 0,
+      tax: Number(tx.tax) || 0,
+      total: Number(tx.total) || 0,
+      paymentMethod: tx.payments?.[0]?.method || tx.paymentMethod || 'cash',
+      items: tx.items || []
+    }
+  })
+
+  // 3. Format inventory stock & restock history
+  let inStockCount = 0
+  let lowStockCount = 0
+  let outOfStockCount = 0
+
+  const inventoryStock = products.map(p => {
+    const qty = Number(p.quantity) || 0
+    const price = Number(p.price) || 0
+    const cost = Number(p.cost) || 0
+    const totalValuation = Math.round(qty * price * 100) / 100
+    const totalCostValue = Math.round(qty * cost * 100) / 100
+    const margin = price > 0 ? Math.round(((price - cost) / price) * 100) : 0
+
+    let status = 'In Stock'
+    if (qty <= 0) {
+      status = 'Out of Stock'
+      outOfStockCount++
+    } else if (qty < 5) {
+      status = 'Critical Low'
+      lowStockCount++
+    } else if (qty < 10) {
+      status = 'Low Stock'
+      lowStockCount++
+    } else {
+      inStockCount++
+    }
+
+    const rawStocked = p.lastStockedAt || p.updatedAt || p.createdAt || null
+    let lastStockedFormatted = 'Initial Setup'
+    if (rawStocked) {
+      const stockDate = new Date(getTime(rawStocked))
+      if (!isNaN(stockDate.getTime())) {
+        lastStockedFormatted = stockDate.toLocaleDateString('en-IN', { day: '2-digit', month: 'short', year: 'numeric' }) + ' ' + stockDate.toLocaleTimeString('en-IN', { hour: '2-digit', minute: '2-digit' })
+      }
+    }
+
+    return {
+      id: p.id,
+      name: p.name || 'Unknown SKU',
+      category: p.category || 'Uncategorized',
+      quantity: qty,
+      cost,
+      price,
+      totalValuation,
+      totalCostValue,
+      marginPercent: `${margin}%`,
+      lastStockedAt: rawStocked,
+      lastStockedFormatted,
+      status
+    }
+  })
+
+  // 4. Pie charts data
+  const PALETTE = ['#3b82f6', '#10b981', '#f59e0b', '#8b5cf6', '#ec4899', '#06b6d4', '#64748b', '#14b8a6']
+  
+  const totalCatSales = Object.values(categorySales).reduce((a, b) => a + b, 0) || 1
+  const salesByCategory = Object.entries(categorySales).map(([label, val], idx) => ({
+    label,
+    value: Math.round(val * 100) / 100,
+    percentage: Math.round((val / totalCatSales) * 100),
+    color: PALETTE[idx % PALETTE.length]
+  })).sort((a, b) => b.value - a.value)
+
+  const totalPay = totalCash + totalUpi || 1
+  const paymentModes = [
+    { label: 'UPI / Digital QR', value: Math.round(totalUpi * 100) / 100, percentage: Math.round((totalUpi / totalPay) * 100), color: '#8b5cf6' },
+    { label: 'Cash Counter', value: Math.round(totalCash * 100) / 100, percentage: Math.round((totalCash / totalPay) * 100), color: '#10b981' }
+  ]
+
+  const totalItems = products.length || 1
+  const stockStatus = [
+    { label: 'In Stock', value: inStockCount, percentage: Math.round((inStockCount / totalItems) * 100), color: '#10b981' },
+    { label: 'Low Stock', value: lowStockCount, percentage: Math.round((lowStockCount / totalItems) * 100), color: '#f59e0b' },
+    { label: 'Out of Stock', value: outOfStockCount, percentage: Math.round((outOfStockCount / totalItems) * 100), color: '#ef4444' }
+  ]
+
+  return {
+    summary: {
+      grandSales: Math.round(grandSales * 100) / 100,
+      totalTransactions: transactions.length,
+      totalStockUnits: products.reduce((acc, p) => acc + (Number(p.quantity) || 0), 0),
+      totalValuation: inventoryStock.reduce((acc, p) => acc + p.totalValuation, 0),
+      totalSKUs: products.length
+    },
+    dailySales,
+    allTransactions,
+    inventoryStock,
+    pieCharts: {
+      salesByCategory,
+      paymentModes,
+      stockStatus
+    }
+  }
+}
+
 module.exports = router
 module.exports.invalidateReportsCache = invalidateReportsCache

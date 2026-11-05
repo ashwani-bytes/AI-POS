@@ -24,6 +24,7 @@ router.post('/', async (req, res) => {
       category: category ? category.trim() : 'Uncategorized',
       createdAt: new Date().toISOString(),
       updatedAt: new Date().toISOString(),
+      lastStockedAt: new Date().toISOString(),
       ownerUid: req.user?.uid || null,
     })
     const snap = await doc.get()
@@ -83,6 +84,7 @@ router.put('/:id', async (req, res) => {
     }
     if (updateData.quantity !== undefined && updateData.quantity !== null && updateData.quantity !== '') {
       updateData.quantity = Number(updateData.quantity)
+      updateData.lastStockedAt = new Date().toISOString()
     }
     if (updateData.name) {
       updateData.name = updateData.name.trim()

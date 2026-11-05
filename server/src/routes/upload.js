@@ -108,6 +108,7 @@ router.post('/', upload.single('image'), async (req, res) => {
             await db().collection('products').doc(matched.id).update({
               quantity: currentQty + cleanQty,
               updatedAt: new Date().toISOString(),
+              lastStockedAt: new Date().toISOString()
             })
             console.log(`[Inventory] Updated stock for "${matched.name}": +${cleanQty}`)
             productsAdded++
@@ -127,6 +128,7 @@ router.post('/', upload.single('image'), async (req, res) => {
               category,
               createdAt: new Date().toISOString(),
               updatedAt: new Date().toISOString(),
+              lastStockedAt: new Date().toISOString(),
               ownerUid: uid,
             })
             item.productId = newDocRef.id
