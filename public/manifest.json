@@ -1,0 +1,25 @@
+{
+  "short_name": "AI POS",
+  "name": "AI POS - Smart Retail Operating System",
+  "description": "Smart retail POS system with Gemini Vision AI camera scanner, ESC/POS thermal printer roll engine, dynamic UPI QR payments, and live sales spreadsheets.",
+  "icons": [
+    {
+      "src": "/logo.png",
+      "type": "image/png",
+      "sizes": "192x192",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "/logo.png",
+      "type": "image/png",
+      "sizes": "512x512",
+      "purpose": "any maskable"
+    }
+  ],
+  "start_url": "/",
+  "background_color": "#0f172a",
+  "theme_color": "#2563eb",
+  "display": "standalone",
+  "orientation": "any",
+  "scope": "/"
+}

@@ -1,9 +1,11 @@
-import React from 'react'
-import { ShoppingCart, Package, Users, BarChart3, Settings, LogOut, Sun, Moon, Sparkles } from 'lucide-react'
+import React, { useState } from 'react'
+import { ShoppingCart, Package, Users, BarChart3, Settings, LogOut, Sun, Moon, Sparkles, Download } from 'lucide-react'
 import { useTheme } from '../context/ThemeContext'
+import InstallAppModal from './InstallAppModal'
 
 const Sidebar = ({ activeView, setActiveView, onLogout, onClose }) => {
   const { t, isDarkMode, toggleTheme, setTheme } = useTheme()
+  const [installModalOpen, setInstallModalOpen] = useState(false)
 
   const menuItems = [
     { id: 'pos', label: 'Point of Sale', badge: 'Billing', icon: ShoppingCart },
@@ -88,6 +90,15 @@ const Sidebar = ({ activeView, setActiveView, onLogout, onClose }) => {
           <span className="text-xs font-mono font-bold text-slate-600 dark:text-slate-400">v1.0.2</span>
         </div>
 
+        <button
+          onClick={() => setInstallModalOpen(true)}
+          className="w-full py-2.5 px-3 rounded-xl bg-blue-50 hover:bg-blue-100 dark:bg-blue-950/60 dark:hover:bg-blue-900/60 border border-blue-200 dark:border-blue-800 text-blue-700 dark:text-blue-300 flex items-center justify-center gap-2 text-xs font-black transition shadow-sm"
+          title="Install App on iPad or Mobile"
+        >
+          <Download className="w-3.5 h-3.5 text-blue-600 dark:text-blue-400" />
+          <span>Install App (iPad / Mobile)</span>
+        </button>
+
         <div className="flex items-center gap-2">
           {/* Dual Segmented Light / Dark Toggle */}
           <div className="flex-1 flex items-center p-1 bg-slate-200 dark:bg-slate-800 rounded-xl border border-slate-300 dark:border-slate-700">
@@ -126,6 +137,12 @@ const Sidebar = ({ activeView, setActiveView, onLogout, onClose }) => {
           </button>
         </div>
       </div>
+
+      {/* PWA App Installation Guide Modal */}
+      <InstallAppModal
+        isOpen={installModalOpen}
+        onClose={() => setInstallModalOpen(false)}
+      />
     </aside>
   )
 }

@@ -2,12 +2,44 @@
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" />
+    
+    <!-- Primary Metadata -->
+    <title>AI POS - Smart Retail Operating System</title>
+    <meta name="title" content="AI POS - Smart Retail Operating System" />
+    <meta name="description" content="AI POS: Gemini Vision AI camera scanner, 80mm/58mm thermal printer roll engine, dynamic UPI auto-print, and live spreadsheets." />
+    <meta name="theme-color" content="#2563eb" />
+
+    <!-- Apple Web App & iOS/iPadOS PWA Support -->
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+    <meta name="apple-mobile-web-app-title" content="AI POS" />
+    <link rel="apple-touch-icon" href="/logo.png" />
+
+    <!-- Progressive Web App Manifest -->
+    <link rel="manifest" href="/manifest.json" />
     <link rel="icon" type="image/png" href="/logo.png" />
-    <title>AI POS</title>
+
+    <!-- Mobile Standalone Support -->
+    <meta name="mobile-web-app-capable" content="yes" />
+    <meta name="format-detection" content="telephone=no" />
   </head>
   <body>
     <div id="root"></div>
     <script type="module" src="/src/main.jsx"></script>
+    <script>
+      // Register Progressive Web App Service Worker
+      if ('serviceWorker' in navigator) {
+        window.addEventListener('load', () => {
+          navigator.serviceWorker.register('/sw.js')
+            .then((registration) => {
+              console.log('AI POS PWA Service Worker registered:', registration.scope);
+            })
+            .catch((err) => {
+              console.log('AI POS PWA Service Worker registration error:', err);
+            });
+        });
+      }
+    </script>
   </body>
 </html>
